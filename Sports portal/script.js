@@ -9,10 +9,10 @@ function login() {
     }
 
     if (role === "coach") {
-        window.location.href = "dashboard/coach.html";
+        window.location.href = "dashboard.coach.html";
     } else if (role === "parent") {
-        window.location.href = "dashboard/parent.html";
+        window.location.href = "dashboard.parent.html";
     } else {
-        window.location.href = "dashboard/player.html";
+        window.location.href = "dashboard.player.html";
     }
 }
