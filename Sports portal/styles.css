@@ -93,3 +93,9 @@ button:hover {
     font-size: 12px;
     font-weight: bold;
 }
+
+.logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 10px;
+}
