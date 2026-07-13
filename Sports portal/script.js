@@ -241,3 +241,125 @@ function postAnnouncement() {
 
 // Always seed data when script loads
 initData();
+
+// ===== EXTEND SEED DATA: add profile fields to players =====
+function ensureProfileFields() {
+    const players = getData("players");
+    let changed = false;
+    players.forEach(p => {
+        if (!p.profile) {
+            p.profile = {
+                bio: "",
+                privacy: "team",
+                medical: "",
+                phone: "",
+                email: "",
+                dob: "",
+                photo: ""
+            };
+            changed = true;
+        }
+        if (!p.settings) {
+            p.settings = { language: "English", notifications: true };
+            changed = true;
+        }
+    });
+    if (changed) saveData("players", players);
+}
+
+// ===== Placeholder messages (UI only) =====
+const placeholderMessages = [
+    { from: "Coach", text: "Great effort at training today!", time: "9:15 AM" },
+    { from: "Team Group", text: "Reminder: match this Sunday, 9am.", time: "Yesterday" }
+];
+
+// ===== TAB SWITCHING (used by all dashboards) =====
+function switchTab(tabId) {
+    document.querySelectorAll(".tab-panel").forEach(el => el.style.display = "none");
+    document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+
+    const panel = document.getElementById(tabId);
+    if (panel) panel.style.display = "block";
+
+    const btn = document.querySelector(`[data-tab="${tabId}"]`);
+    if (btn) btn.classList.add("active");
+}
+
+// ===== PROFILE RENDER (player) =====
+function renderPlayerProfile() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    if (!player) return;
+
+    document.getElementById("profile-name").textContent = player.name;
+    document.getElementById("profile-team").textContent = "Team: Senior Cricket Squad";
+    document.getElementById("profile-stats").innerHTML = `
+        <p>Matches: ${player.stats.matches} | Runs: ${player.stats.runs} | Wickets: ${player.stats.wickets}</p>
+    `;
+    document.getElementById("profile-bio").textContent = player.profile.bio || "No bio added yet.";
+
+    // Pre-fill edit form
+    document.getElementById("edit-name").value = player.name;
+    document.getElementById("edit-bio").value = player.profile.bio;
+    document.getElementById("edit-medical").value = player.profile.medical;
+    document.getElementById("edit-phone").value = player.profile.phone;
+    document.getElementById("edit-email").value = player.profile.email;
+    document.getElementById("edit-dob").value = player.profile.dob;
+    document.getElementById("edit-privacy").value = player.profile.privacy;
+}
+
+function saveProfile() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const players = getData("players");
+    const player = players.find(p => p.id === linkedId);
+    if (!player) return;
+
+    player.name = document.getElementById("edit-name").value.trim() || player.name;
+    player.profile.bio = document.getElementById("edit-bio").value.trim();
+    player.profile.medical = document.getElementById("edit-medical").value.trim();
+    player.profile.phone = document.getElementById("edit-phone").value.trim();
+    player.profile.email = document.getElementById("edit-email").value.trim();
+    player.profile.dob = document.getElementById("edit-dob").value;
+    player.profile.privacy = document.getElementById("edit-privacy").value;
+
+    saveData("players", players);
+    alert("Profile updated!");
+    renderPlayerProfile();
+    switchTab("tab-profile");
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    if (!player) return;
+    document.getElementById("setting-language").value = player.settings.language;
+    document.getElementById("setting-notifications").checked = player.settings.notifications;
+}
+
+function saveSettings() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const players = getData("players");
+    const player = players.find(p => p.id === linkedId);
+    if (!player) return;
+    player.settings.language = document.getElementById("setting-language").value;
+    player.settings.notifications = document.getElementById("setting-notifications").checked;
+    saveData("players", players);
+    alert("Settings saved!");
+}
+
+// ===== MESSAGES (placeholder UI) =====
+function renderMessages() {
+    const container = document.getElementById("messages-list");
+    if (!container) return;
+    container.innerHTML = placeholderMessages.map(m => `
+        <div class="card">
+            <strong>${m.from}</strong>
+            <p>${m.text}</p>
+            <small>${m.time}</small>
+        </div>
+    `).join("");
+}
+
+// Run field setup on load
+ensureProfileFields();

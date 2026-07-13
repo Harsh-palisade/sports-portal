@@ -6,6 +6,7 @@
 </head>
 <body>
 
+<!-- ===== Top Bar ===== -->
 <div class="navbar">
     <h1>🏏 Sports Portal</h1>
     <div class="nav-right">
@@ -15,27 +16,116 @@
     </div>
 </div>
 
+<!-- ===== Top Tabs ===== -->
+<div class="top-tabs">
+    <button class="nav-btn" data-tab="tab-members" onclick="switchTab('tab-members')">Members</button>
+    <button class="nav-btn" data-tab="tab-photos" onclick="switchTab('tab-photos')">Photos</button>
+    <button class="nav-btn" data-tab="tab-teaminfo" onclick="switchTab('tab-teaminfo')">Team Info</button>
+    <button class="nav-btn" data-tab="tab-fees" onclick="switchTab('tab-fees')">Fees</button>
+</div>
+
 <div class="dashboard">
-    <h1>Parent Dashboard</h1>
 
-    <!-- Child's Fee Status -->
-    <div class="card">
-        <h3>Child Fee Status</h3>
-        <div id="fee-status"></div>
+    <!-- ===== HOME ===== -->
+    <div id="tab-home" class="tab-panel">
+        <h1>Welcome back!</h1>
+        <div class="card">
+            <h3>Child Overview</h3>
+            <div id="my-stats"></div>
+        </div>
+        <div class="card">
+            <h3>Latest Announcement</h3>
+            <div id="announcements-list"></div>
+        </div>
     </div>
 
-    <!-- Upcoming Matches (view only) -->
-    <div class="card">
-        <h3>Upcoming Matches</h3>
-        <div id="matches-list"></div>
+    <!-- ===== SCHEDULE ===== -->
+    <div id="tab-schedule" class="tab-panel" style="display:none;">
+        <h1>Schedule</h1>
+        <div class="card">
+            <h3>Upcoming Matches</h3>
+            <div id="matches-list"></div>
+        </div>
     </div>
 
-    <!-- Announcements (view only) -->
-    <div class="card">
-        <h3>Announcements</h3>
-        <div id="announcements-list"></div>
+    <!-- ===== MESSAGES ===== -->
+    <div id="tab-messages" class="tab-panel" style="display:none;">
+        <h1>Messages</h1>
+        <div id="messages-list"></div>
     </div>
 
+    <!-- ===== MEMBERS (view only) ===== -->
+    <div id="tab-members" class="tab-panel" style="display:none;">
+        <h1>Members</h1>
+        <div id="roster-view"></div>
+    </div>
+
+    <!-- ===== PHOTOS ===== -->
+    <div id="tab-photos" class="tab-panel" style="display:none;">
+        <h1>Photos</h1>
+        <div class="card"><p>No photos uploaded yet. Check back after the next match!</p></div>
+    </div>
+
+    <!-- ===== TEAM INFO ===== -->
+    <div id="tab-teaminfo" class="tab-panel" style="display:none;">
+        <h1>Team Info</h1>
+        <div class="card">
+            <h3>Senior Cricket Squad</h3>
+            <p>Home Ground: Central Oval</p>
+            <p>Training: Tuesdays & Thursdays, 5:30 PM</p>
+            <p>Coach: coach1</p>
+        </div>
+    </div>
+
+    <!-- ===== FEES (view only) ===== -->
+    <div id="tab-fees" class="tab-panel" style="display:none;">
+        <h1>Child's Fees</h1>
+        <div class="card">
+            <div id="fee-status"></div>
+        </div>
+    </div>
+
+    <!-- ===== PROFILE (You) ===== -->
+    <div id="tab-profile" class="tab-panel" style="display:none;">
+        <h1>Profile</h1>
+        <div class="card">
+            <h3>Parent Account</h3>
+            <p id="username-label-2"></p>
+        </div>
+        <div class="card">
+            <h3>Child Linked</h3>
+            <p id="linked-child-name"></p>
+        </div>
+        <div class="card">
+            <h3>Help & Support</h3>
+            <button onclick="switchTab('tab-help')">About, Help & Logout</button>
+        </div>
+    </div>
+
+    <!-- ===== HELP & SUPPORT ===== -->
+    <div id="tab-help" class="tab-panel" style="display:none;">
+        <h1>Help & Support</h1>
+        <div class="card">
+            <h3>About App</h3>
+            <p>Sports Portal — Cricket Management System. Built as a Year 12 Software Engineering major project.</p>
+        </div>
+        <div class="card">
+            <h3>Get Help</h3>
+            <p>Contact your coach or team admin for support.</p>
+        </div>
+        <div class="card">
+            <button onclick="logout()">Log Out</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== Bottom Nav ===== -->
+<div class="bottom-nav">
+    <button class="nav-btn active" data-tab="tab-home" onclick="switchTab('tab-home')">Home</button>
+    <button class="nav-btn" data-tab="tab-schedule" onclick="switchTab('tab-schedule')">Schedule</button>
+    <button class="nav-btn" data-tab="tab-messages" onclick="switchTab('tab-messages')">Messages</button>
+    <button class="nav-btn" data-tab="tab-profile" onclick="switchTab('tab-profile')">You</button>
 </div>
 
 <script src="script.js"></script>
@@ -45,6 +135,29 @@
     renderFeeForLinkedPlayer();
     renderMatches();
     renderAnnouncements();
+    renderMessages();
+
+    // "My stats" reused to show child's stats on Home
+    (function renderChildStats() {
+        const linkedId = localStorage.getItem("linkedPlayerId");
+        const player = getData("players").find(p => p.id === linkedId);
+        const container = document.getElementById("my-stats");
+        if (player && container) {
+            container.innerHTML = `<p>${player.name} — Matches: ${player.stats.matches} | Runs: ${player.stats.runs} | Wickets: ${player.stats.wickets}</p>`;
+        }
+        const nameLabel = document.getElementById("linked-child-name");
+        if (player && nameLabel) nameLabel.textContent = player.name;
+    })();
+
+    const label2 = document.getElementById("username-label-2");
+    if (label2) label2.textContent = "Username: " + localStorage.getItem("loggedInUser");
+
+    // Read-only roster for Members tab
+    (function renderRosterView() {
+        const container = document.getElementById("roster-view");
+        const players = getData("players");
+        container.innerHTML = players.map(p => `<div class="card"><h3>${p.name}</h3></div>`).join("");
+    })();
 </script>
 
 </body>

@@ -6,6 +6,7 @@
 </head>
 <body>
 
+<!-- ===== Top Bar ===== -->
 <div class="navbar">
     <h1>🏏 Sports Portal</h1>
     <div class="nav-right">
@@ -15,53 +16,126 @@
     </div>
 </div>
 
+<!-- ===== Top Tabs ===== -->
+<div class="top-tabs">
+    <button class="nav-btn" data-tab="tab-members" onclick="switchTab('tab-members')">Members</button>
+    <button class="nav-btn" data-tab="tab-photos" onclick="switchTab('tab-photos')">Photos</button>
+    <button class="nav-btn" data-tab="tab-teaminfo" onclick="switchTab('tab-teaminfo')">Team Info</button>
+    <button class="nav-btn" data-tab="tab-fees" onclick="switchTab('tab-fees')">Fees</button>
+</div>
+
 <div class="dashboard">
-    <h1>Coach Dashboard</h1>
 
-    <!-- Upcoming Matches -->
-    <div class="card">
-        <h3>Upcoming Matches</h3>
-        <div id="matches-list"></div>
-
-        <hr style="border-color: rgba(255,255,255,0.15); margin: 16px 0;">
-
-        <h3>Add New Match</h3>
-        <input type="text" id="new-opponent" placeholder="Opponent team">
-        <input type="date" id="new-date">
-        <input type="text" id="new-venue" placeholder="Venue">
-        <button onclick="addMatch()">Add Match</button>
+    <!-- ===== HOME ===== -->
+    <div id="tab-home" class="tab-panel">
+        <h1>Coach Home</h1>
+        <div class="card">
+            <h3>Team Overview</h3>
+            <p>Manage training, players, and matches from the tabs above and below.</p>
+        </div>
+        <div class="card">
+            <h3>Latest Announcements</h3>
+            <div id="announcements-list"></div>
+        </div>
     </div>
 
-    <!-- Team Roster -->
-    <div class="card">
-        <h3>Team Roster</h3>
-        <div id="roster-list"></div>
-
-        <hr style="border-color: rgba(255,255,255,0.15); margin: 16px 0;">
-
-        <h3>Add New Player</h3>
-        <input type="text" id="new-player-name" placeholder="Player name">
-        <button onclick="addPlayer()">Add Player</button>
+    <!-- ===== SCHEDULE ===== -->
+    <div id="tab-schedule" class="tab-panel" style="display:none;">
+        <h1>Schedule</h1>
+        <div class="card">
+            <h3>Upcoming Matches</h3>
+            <div id="matches-list"></div>
+            <hr>
+            <h3>Add New Match</h3>
+            <input type="text" id="new-opponent" placeholder="Opponent team">
+            <input type="date" id="new-date">
+            <input type="text" id="new-venue" placeholder="Venue">
+            <button onclick="addMatch()">Add Match</button>
+        </div>
     </div>
 
-    <!-- Fees -->
-    <div class="card">
-        <h3>Fees Management</h3>
+    <!-- ===== MESSAGES ===== -->
+    <div id="tab-messages" class="tab-panel" style="display:none;">
+        <h1>Messages</h1>
+        <div id="messages-list"></div>
+    </div>
+
+    <!-- ===== MEMBERS (coach can add/remove) ===== -->
+    <div id="tab-members" class="tab-panel" style="display:none;">
+        <h1>Members</h1>
+        <div class="card">
+            <div id="roster-list"></div>
+            <hr>
+            <h3>Add New Player</h3>
+            <input type="text" id="new-player-name" placeholder="Player name">
+            <button onclick="addPlayer()">Add Player</button>
+        </div>
+    </div>
+
+    <!-- ===== PHOTOS ===== -->
+    <div id="tab-photos" class="tab-panel" style="display:none;">
+        <h1>Photos</h1>
+        <div class="card"><p>No photos uploaded yet.</p></div>
+    </div>
+
+    <!-- ===== TEAM INFO ===== -->
+    <div id="tab-teaminfo" class="tab-panel" style="display:none;">
+        <h1>Team Info</h1>
+        <div class="card">
+            <h3>Senior Cricket Squad</h3>
+            <p>Home Ground: Central Oval</p>
+            <p>Training: Tuesdays & Thursdays, 5:30 PM</p>
+        </div>
+    </div>
+
+    <!-- ===== FEES (coach can toggle) ===== -->
+    <div id="tab-fees" class="tab-panel" style="display:none;">
+        <h1>Fees Management</h1>
         <div id="fees-list"></div>
     </div>
 
-    <!-- Announcements -->
-    <div class="card">
-        <h3>Announcements</h3>
-        <div id="announcements-list"></div>
-
-        <hr style="border-color: rgba(255,255,255,0.15); margin: 16px 0;">
-
-        <h3>Post Announcement</h3>
-        <input type="text" id="new-announcement" placeholder="Write an announcement...">
-        <button onclick="postAnnouncement()">Post</button>
+    <!-- ===== ANNOUNCEMENTS (posting lives on Home + here for convenience) ===== -->
+    <div id="tab-announcements" class="tab-panel" style="display:none;">
+        <h1>Post Announcement</h1>
+        <div class="card">
+            <input type="text" id="new-announcement" placeholder="Write an announcement...">
+            <button onclick="postAnnouncement()">Post</button>
+        </div>
     </div>
 
+    <!-- ===== PROFILE (You) ===== -->
+    <div id="tab-profile" class="tab-panel" style="display:none;">
+        <h1>Profile</h1>
+        <div class="card">
+            <h3>Coach Account</h3>
+            <p id="username-label-2"></p>
+        </div>
+        <div class="card">
+            <h3>Help & Support</h3>
+            <button onclick="switchTab('tab-help')">About, Help & Logout</button>
+        </div>
+    </div>
+
+    <!-- ===== HELP & SUPPORT ===== -->
+    <div id="tab-help" class="tab-panel" style="display:none;">
+        <h1>Help & Support</h1>
+        <div class="card">
+            <h3>About App</h3>
+            <p>Sports Portal — Cricket Management System. Built as a Year 12 Software Engineering major project.</p>
+        </div>
+        <div class="card">
+            <button onclick="logout()">Log Out</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== Bottom Nav ===== -->
+<div class="bottom-nav">
+    <button class="nav-btn active" data-tab="tab-home" onclick="switchTab('tab-home')">Home</button>
+    <button class="nav-btn" data-tab="tab-schedule" onclick="switchTab('tab-schedule')">Schedule</button>
+    <button class="nav-btn" data-tab="tab-messages" onclick="switchTab('tab-messages')">Messages</button>
+    <button class="nav-btn" data-tab="tab-profile" onclick="switchTab('tab-profile')">You</button>
 </div>
 
 <script src="script.js"></script>
@@ -72,6 +146,10 @@
     renderRoster();
     renderFeesCoach();
     renderAnnouncements();
+    renderMessages();
+
+    const label2 = document.getElementById("username-label-2");
+    if (label2) label2.textContent = "Username: " + localStorage.getItem("loggedInUser");
 </script>
 
 </body>
