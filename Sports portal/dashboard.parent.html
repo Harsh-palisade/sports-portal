@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>Parent Dashboard</title>
@@ -6,20 +6,46 @@
 </head>
 <body>
 
+<div class="navbar">
+    <h1>🏏 Sports Portal</h1>
+    <div class="nav-right">
+        <span id="username-label"></span>
+        <span id="role-badge" class="role-badge"></span>
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
+
 <div class="dashboard">
     <h1>Parent Dashboard</h1>
 
+    <!-- Child's Fee Status -->
     <div class="card">
-        <h3>Child Progress</h3>
-        <p>View training updates, match progress, and attendance.</p>
+        <h3>Child Fee Status</h3>
+        <div id="fee-status"></div>
     </div>
 
+    <!-- Upcoming Matches (view only) -->
     <div class="card">
         <h3>Upcoming Matches</h3>
-        <p>No matches scheduled yet.</p>
+        <div id="matches-list"></div>
+    </div>
+
+    <!-- Announcements (view only) -->
+    <div class="card">
+        <h3>Announcements</h3>
+        <div id="announcements-list"></div>
     </div>
 
 </div>
+
+<script src="script.js"></script>
+<script>
+    requireLogin("parent");
+    renderNavbar();
+    renderFeeForLinkedPlayer();
+    renderMatches();
+    renderAnnouncements();
+</script>
 
 </body>
 </html>
