@@ -1,21 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sports Portal</title>
+    <title>Sports Portal Login</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="login-container">
-   <img src="assets/logo.png" class="logo">
+<div class="split-page">
 
-    <h1>🏏 Sports Portal</h1>
-    <p>Welcome to Cricket Management System</p>
+    <div class="split-brand">
+        <div class="brand-content">
+            <img src="assets/logo.png" class="logo" alt="logo">
+            <h1 class="brand-title">🏏 Sports Portal</h1>
+            <p class="brand-tagline">Manage your team, matches, and fees — all in one place.</p>
+        </div>
+        <div class="brand-blob blob1"></div>
+        <div class="brand-blob blob2"></div>
+    </div>
 
-    <a href="login.html">
-        <button>Enter Portal</button>
-    </a>
+    <div class="split-form">
+        <div class="login-container">
+            <h2 class="login-title">Welcome back</h2>
+            <p class="login-subtitle">Log in to continue</p>
+
+            <div class="login-form">
+                <label class="input-label">I am a...</label>
+                <select id="role">
+                    <option value="coach">Coach</option>
+                    <option value="parent">Parent</option>
+                    <option value="player">Player</option>
+                </select>
+
+                <label class="input-label">Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
+
+                <label class="input-label">Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+
+                <button onclick="login()">Login</button>
+            </div>
+
+            <p class="login-footer">Enter your team credentials to continue</p>
+        </div>
+    </div>
+
 </div>
 
+<script src="script.js"></script>
 </body>
 </html>

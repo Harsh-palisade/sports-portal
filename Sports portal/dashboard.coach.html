@@ -72,11 +72,17 @@
         </div>
     </div>
 
-    <!-- ===== PHOTOS ===== -->
-    <div id="tab-photos" class="tab-panel" style="display:none;">
-        <h1>Photos</h1>
-        <div class="card"><p>No photos uploaded yet.</p></div>
+   <!-- ===== PHOTOS ===== -->
+<div id="tab-photos" class="tab-panel" style="display:none;">
+    <h1>Photos</h1>
+    <div class="card">
+        <h3>Upload New Photo</h3>
+        <input type="file" id="photo-file" accept="image/*">
+        <input type="text" id="photo-caption" placeholder="Caption (optional)">
+        <button onclick="uploadPhoto()">Upload</button>
     </div>
+    <div id="photos-grid" class="photos-grid"></div>
+</div>
 
     <!-- ===== TEAM INFO ===== -->
     <div id="tab-teaminfo" class="tab-panel" style="display:none;">

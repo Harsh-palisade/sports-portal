@@ -363,3 +363,64 @@ function renderMessages() {
 
 // Run field setup on load
 ensureProfileFields();
+
+// ===== PHOTOS =====
+function ensurePhotosSeed() {
+    if (localStorage.getItem("photosInitialized")) return;
+    const photos = [
+        { id: "ph1", url: "https://picsum.photos/seed/cricket1/400/280", caption: "Training session", date: "2026-07-05" },
+        { id: "ph2", url: "https://picsum.photos/seed/cricket2/400/280", caption: "Match day warm-up", date: "2026-07-12" },
+        { id: "ph3", url: "https://picsum.photos/seed/cricket3/400/280", caption: "Team huddle", date: "2026-07-14" }
+    ];
+    saveData("photos", photos);
+    localStorage.setItem("photosInitialized", "true");
+}
+
+function renderPhotos() {
+    const container = document.getElementById("photos-grid");
+    if (!container) return;
+    const photos = getData("photos");
+    container.innerHTML = photos.length ? photos.map(p => `
+        <div class="photo-card">
+            <img src="${p.url}" alt="${p.caption}">
+            <p>${p.caption}</p>
+            <small>${p.date}</small>
+        </div>
+    `).join("") : "<p>No photos uploaded yet.</p>";
+}
+
+function uploadPhoto() {
+    const fileInput = document.getElementById("photo-file");
+    const captionInput = document.getElementById("photo-caption");
+    const file = fileInput.files[0];
+
+    if (!file) { alert("Choose a photo first"); return; }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const photos = getData("photos");
+        photos.unshift({
+            id: "ph" + Date.now(),
+            url: e.target.result,
+            caption: captionInput.value.trim() || "Team photo",
+            date: new Date().toISOString().split("T")[0]
+        });
+        saveData("photos", photos);
+        renderPhotos();
+        fileInput.value = "";
+        captionInput.value = "";
+    };
+    reader.readAsDataURL(file);
+}
+
+// ===== MORE MESSAGES =====
+placeholderMessages.push(
+    { from: "Coach", text: "Well played everyone in Sunday's match!", time: "2 days ago" },
+    { from: "Team Group", text: "New training kit has arrived, collect from the clubhouse.", time: "3 days ago" },
+    { from: "Coach", text: "Fees are due by end of the month, please check your dashboard.", time: "5 days ago" },
+    { from: "Team Group", text: "Photos from last week's match are now up!", time: "1 week ago" }
+);
+
+ensurePhotosSeed();
+
+renderPhotos();
