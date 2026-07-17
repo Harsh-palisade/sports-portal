@@ -6,290 +6,44 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(160deg, #0b3d2e 0%, #0d2e22 100%);
-    color: white;
-    min-height: 100vh;
-}
-
-/* ===== Logo ===== */
-.logo {
-    width: 100px;
-    height: auto;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-}
-
-/* ===== Landing / Login Container ===== */
-.login-container {
-    width: 360px;
-    margin: 100px auto;
-    padding: 35px 30px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    text-align: center;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-}
-
-.login-container h1 {
-    font-size: 28px;
-    margin: 10px 0 5px;
-}
-
-.login-container h2 {
-    margin-bottom: 20px;
-    color: #ffffff;
-    font-size: 22px;
-}
-
-.login-container p {
-    color: rgba(255,255,255,0.75);
-    margin-bottom: 20px;
-}
-
-/* ===== Inputs ===== */
-input, select {
-    width: 90%;
-    padding: 12px;
-    margin: 8px 0;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    background: rgba(255,255,255,0.95);
-    font-size: 14px;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-input:focus, select:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(244, 196, 48, 0.5);
-    transform: translateY(-1px);
-}
-
-/* ===== Buttons ===== */
-button {
-    width: 95%;
-    padding: 12px;
-    background: #f4c430;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-button:hover {
-    background: #ffdb63;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(244, 196, 48, 0.35);
-}
-
-button:active {
-    transform: translateY(0);
-}
-
-/* ===== Navbar ===== */
-.navbar {
-    background: #1e3a8a;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-.navbar h1 {
-    margin: 0;
-    font-size: 20px;
-}
-
-.navbar .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.navbar button {
-    width: auto;
-    padding: 8px 16px;
-    margin: 0;
-    font-size: 13px;
-}
-
-/* ===== Dashboard ===== */
-.dashboard {
-    padding: 30px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.dashboard h1 {
-    font-size: 30px;
-    margin-bottom: 24px;
-    border-bottom: 2px solid rgba(244, 196, 48, 0.4);
-    padding-bottom: 12px;
-}
-
-/* ===== Cards ===== */
-.card {
-    background: rgba(255, 255, 255, 0.08);
-    padding: 20px;
-    margin: 16px 0;
-    border-radius: 12px;
-    border-left: 5px solid #f4c430;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-}
-
-.card h3 {
-    margin-top: 0;
-    color: #ffffff;
-    font-size: 18px;
-}
-
-.card p {
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 0;
-    line-height: 1.5;
-}
-
-/* ===== Role Badge ===== */
-.role-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    background: #f4c430;
-    color: #1a1a1a;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-}
-
-/* ===== Match items ===== */
-.match-item {
-    background: rgba(255,255,255,0.06);
-    padding: 12px;
-    border-radius: 8px;
-    margin: 8px 0;
-    line-height: 1.6;
-}
-
-/* ===== Navbar username label ===== */
-#username-label {
-    font-size: 14px;
-    color: rgba(255,255,255,0.85);
-}
-
-/* ===== Card sub-sections (inputs inside cards, e.g. Add Match / Add Player) ===== */
-.card input {
-    background: rgba(255,255,255,0.95);
-}
-
-.card hr {
-    border: none;
-    border-top: 1px solid rgba(255,255,255,0.15);
-}
-
-/* ===== Small text under announcements ===== */
-.card small {
-    display: block;
-    margin-top: 6px;
-    color: rgba(255,255,255,0.55);
-    font-size: 12px;
-}
-
-/* ===== Top Tabs ===== */
-.top-tabs {
-    display: flex;
-    background: rgba(255,255,255,0.05);
-    padding: 10px 20px;
-    gap: 10px;
-    overflow-x: auto;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-/* ===== Bottom Nav ===== */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-around;
-    background: #1e3a8a;
-    padding: 10px 0;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
-    z-index: 100;
-}
-
-/* ===== Nav buttons (shared by top tabs + bottom nav) ===== */
-.nav-btn {
-    width: auto;
-    background: transparent;
-    color: rgba(255,255,255,0.7);
-    border: none;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 8px;
-    margin: 0;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.nav-btn:hover {
-    background: rgba(255,255,255,0.1);
-    color: white;
-}
-
-.nav-btn.active {
-    background: #f4c430;
-    color: #1a1a1a;
-}
-
-/* ===== Dashboard bottom padding so content isn't hidden behind bottom nav ===== */
-.dashboard {
-    padding-bottom: 90px;
-}
-
-/* ===== Labels inside forms ===== */
-.card label {
-    display: block;
-    text-align: left;
-    font-size: 13px;
-    color: rgba(255,255,255,0.75);
-    margin-top: 10px;
-    margin-bottom: 2px;
-}
-
-/* ===== Login Page Redesign ===== */
-.login-page {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background:
-        radial-gradient(circle at 20% 20%, rgba(244,196,48,0.08), transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(30,58,138,0.15), transparent 40%),
-        linear-gradient(160deg, #0b3d2e 0%, #082419 100%);
-    padding:/* ===== Base ===== */
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f4f6f9;
     color: #1a1a2e;
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    background-color: #f4f6f9;
+    background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.35;
+}
+
+body::before {
+    width: 420px;
+    height: 420px;
+    background: #86efac;
+    top: -100px;
+    left: -100px;
+}
+
+body::after {
+    width: 500px;
+    height: 500px;
+    background: #fcd34d;
+    bottom: -150px;
+    right: -150px;
+}
+
+.navbar, .top-tabs, .bottom-nav, .card, .login-container {
+    position: relative;
+    z-index: 1;
 }
 
 h1, h2, h3 {
@@ -303,23 +57,117 @@ h1, h2, h3 {
     margin-bottom: 12px;
 }
 
-/* ===== Login Page ===== */
-.login-page {
+/* ===== Split Login Page ===== */
+.split-page {
+    display: flex;
     min-height: 100vh;
+    width: 100%;
+}
+
+.split-brand {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(160deg, #eef2ff 0%, #f4f6f9 100%);
-    padding: 20px;
+    background: linear-gradient(135deg, #166534 0%, #22c55e 60%, #4ade80 100%);
+    padding: 40px;
 }
 
+.brand-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+    max-width: 340px;
+}
+
+.brand-content .logo {
+    filter: brightness(0) invert(1);
+    margin-bottom: 16px;
+}
+
+.brand-title {
+    font-size: 30px;
+    margin: 0 0 12px;
+}
+
+.brand-tagline {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+}
+
+.brand-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.4;
+    z-index: 1;
+    animation: float 8s ease-in-out infinite;
+}
+
+.blob1 {
+    width: 300px;
+    height: 300px;
+    background: #fcd34d;
+    top: -60px;
+    right: -60px;
+}
+
+.blob2 {
+    width: 260px;
+    height: 260px;
+    background: #86efac;
+    bottom: -60px;
+    left: -60px;
+    animation-delay: 2s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.split-form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    padding: 40px 20px;
+}
+
+.split-form .login-container {
+    width: 100%;
+    max-width: 360px;
+    box-shadow: none;
+    padding: 0;
+    animation: fadeInUp 0.5s ease;
+}
+
+@media (max-width: 800px) {
+    .split-page {
+        flex-direction: column;
+    }
+    .split-brand {
+        min-height: 260px;
+        padding: 30px;
+    }
+    .split-form {
+        padding: 30px 20px;
+    }
+}
+
+/* ===== Login Container (shared / index.html) ===== */
 .login-container {
     width: 360px;
     padding: 40px 32px;
     background: #ffffff;
     text-align: center;
     border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(30, 58, 138, 0.12);
+    box-shadow: 0 10px 40px rgba(34, 197, 94, 0.12);
     animation: fadeInUp 0.5s ease;
 }
 
@@ -331,7 +179,7 @@ h1, h2, h3 {
 .login-title {
     font-size: 26px;
     margin: 10px 0 2px;
-    color: #1e3a8a;
+    color: #166534;
 }
 
 .login-subtitle {
@@ -360,10 +208,9 @@ h1, h2, h3 {
     color: #9ca3af;
 }
 
-/* ===== Landing page container (index.html reuses login-container) ===== */
 .login-container h1 {
     font-size: 26px;
-    color: #1e3a8a;
+    color: #166534;
     margin: 10px 0 5px;
 }
 
@@ -387,8 +234,8 @@ input, select {
 
 input:focus, select:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
     background: #ffffff;
 }
 
@@ -396,7 +243,7 @@ input:focus, select:focus {
 button {
     width: 100%;
     padding: 13px;
-    background: #2563eb;
+    background: #22c55e;
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -408,9 +255,9 @@ button {
 }
 
 button:hover {
-    background: #1d4ed8;
+    background: #16a34a;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.25);
 }
 
 button:active {
@@ -431,7 +278,7 @@ button:active {
 .navbar h1 {
     margin: 0;
     font-size: 19px;
-    color: #1e3a8a;
+    color: #166534;
 }
 
 .navbar .nav-right {
@@ -485,7 +332,7 @@ button:active {
     z-index: 100;
 }
 
-/* ===== Nav buttons (top tabs + bottom nav) ===== */
+/* ===== Nav buttons ===== */
 .nav-btn {
     width: auto;
     background: transparent;
@@ -501,14 +348,14 @@ button:active {
 }
 
 .nav-btn:hover {
-    background: #eef2ff;
-    color: #2563eb;
+    background: #ecfdf5;
+    color: #16a34a;
     transform: none;
     box-shadow: none;
 }
 
 .nav-btn.active {
-    background: #2563eb;
+    background: #22c55e;
     color: #ffffff;
 }
 
@@ -532,7 +379,7 @@ button:active {
     padding: 20px;
     margin: 14px 0;
     border-radius: 14px;
-    border-left: 4px solid #2563eb;
+    border-left: 4px solid #22c55e;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -592,51 +439,10 @@ button:active {
 .role-badge {
     display: inline-block;
     padding: 5px 12px;
-    background: #eef2ff;
-    color: #2563eb;
+    background: #ecfdf5;
+    color: #16a34a;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.3px;
-} 20px;
-}
-
-.login-page .login-container {
-    animation: fadeInUp 0.5s ease;
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.login-title {
-    font-size: 26px;
-    margin: 10px 0 2px;
-    letter-spacing: 0.5px;
-}
-
-.login-subtitle {
-    color: rgba(255,255,255,0.65);
-    font-size: 14px;
-    margin-bottom: 24px;
-}
-
-.login-form {
-    text-align: left;
-}
-
-.input-label {
-    display: block;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: rgba(255,255,255,0.6);
-    margin: 14px 0 4px;
-}
-
-.login-footer {
-    margin-top: 20px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.45);
 }
