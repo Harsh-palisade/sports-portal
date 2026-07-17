@@ -424,3 +424,153 @@ placeholderMessages.push(
 ensurePhotosSeed();
 
 renderPhotos();
+
+// ===== EXPAND ROSTER (adds more players if fewer than 15 exist) =====
+function ensureMorePlayers() {
+    let players = getData("players");
+    if (players.length >= 15) return;
+
+    const extraNames = [
+        "Jordan Blake", "Mia Chen", "Ethan Wright", "Priya Nair", "Liam Foster",
+        "Zoe Martinez", "Noah Bennett", "Ava Thompson", "Ryan Okafor", "Chloe Baker",
+        "Kai Nakamura", "Emily Scott", "Marcus Reid"
+    ];
+
+    let counter = players.length + 1;
+    extraNames.forEach(name => {
+        if (players.length >= 15) return;
+        const id = "p" + counter;
+        players.push({
+            id,
+            username: "player" + counter,
+            password: "player123",
+            name,
+            fees: { amount: 150, paid: Math.random() > 0.5 },
+            stats: {
+                matches: Math.floor(Math.random() * 10) + 1,
+                runs: Math.floor(Math.random() * 300),
+                wickets: Math.floor(Math.random() * 15)
+            },
+            profile: { bio: "", privacy: "team", medical: "", phone: "", email: "", dob: "", photo: "" },
+            settings: { language: "English", notifications: true }
+        });
+        counter++;
+    });
+
+    saveData("players", players);
+}
+
+// ===== REAL CHAT (coach <-> each player) =====
+function getChats() {
+    return JSON.parse(localStorage.getItem("chats")) || {};
+}
+
+function saveChats(chats) {
+    localStorage.setItem("chats", JSON.stringify(chats));
+}
+
+function getChatFor(playerId) {
+    const chats = getChats();
+    return chats[playerId] || [];
+}
+
+function nowTime() {
+    const d = new Date();
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// ----- Coach side -----
+let activeChatPlayerId = null;
+
+function renderCoachChatList() {
+    const container = document.getElementById("chat-player-list");
+    if (!container) return;
+    const players = getData("players");
+    container.innerHTML = players.map(p => `
+        <div class="chat-contact ${p.id === activeChatPlayerId ? 'active' : ''}" onclick="openCoachChat('${p.id}')">
+            <strong>${p.name}</strong>
+        </div>
+    `).join("");
+}
+
+function openCoachChat(playerId) {
+    activeChatPlayerId = playerId;
+    renderCoachChatList();
+    renderCoachChatWindow();
+}
+
+function renderCoachChatWindow() {
+    const windowEl = document.getElementById("chat-window");
+    const titleEl = document.getElementById("chat-window-title");
+    if (!windowEl) return;
+
+    if (!activeChatPlayerId) {
+        windowEl.innerHTML = "<p style='padding:20px; color:#9ca3af;'>Select a player to start chatting.</p>";
+        if (titleEl) titleEl.textContent = "";
+        return;
+    }
+
+    const players = getData("players");
+    const player = players.find(p => p.id === activeChatPlayerId);
+    if (titleEl) titleEl.textContent = "Chat with " + (player ? player.name : "");
+
+    const messages = getChatFor(activeChatPlayerId);
+    windowEl.innerHTML = messages.length ? messages.map(m => `
+        <div class="chat-bubble ${m.from === 'coach' ? 'from-me' : 'from-them'}">
+            <p>${m.text}</p>
+            <small>${m.time}</small>
+        </div>
+    `).join("") : "<p style='padding:20px; color:#9ca3af;'>No messages yet. Say hello!</p>";
+
+    windowEl.scrollTop = windowEl.scrollHeight;
+}
+
+function sendCoachMessage() {
+    if (!activeChatPlayerId) { alert("Select a player first"); return; }
+    const input = document.getElementById("chat-input");
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chats = getChats();
+    if (!chats[activeChatPlayerId]) chats[activeChatPlayerId] = [];
+    chats[activeChatPlayerId].push({ from: "coach", text, time: nowTime() });
+    saveChats(chats);
+
+    input.value = "";
+    renderCoachChatWindow();
+}
+
+// ----- Player side -----
+function renderPlayerChat() {
+    const windowEl = document.getElementById("chat-window");
+    if (!windowEl) return;
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const messages = getChatFor(linkedId);
+
+    windowEl.innerHTML = messages.length ? messages.map(m => `
+        <div class="chat-bubble ${m.from === 'player' ? 'from-me' : 'from-them'}">
+            <p>${m.text}</p>
+            <small>${m.time}</small>
+        </div>
+    `).join("") : "<p style='padding:20px; color:#9ca3af;'>No messages yet. Message your coach!</p>";
+
+    windowEl.scrollTop = windowEl.scrollHeight;
+}
+
+function sendPlayerMessage() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const input = document.getElementById("chat-input");
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chats = getChats();
+    if (!chats[linkedId]) chats[linkedId] = [];
+    chats[linkedId].push({ from: "player", text, time: nowTime() });
+    saveChats(chats);
+
+    input.value = "";
+    renderPlayerChat();
+}
+
+// Run expansions on load
+ensureMorePlayers();

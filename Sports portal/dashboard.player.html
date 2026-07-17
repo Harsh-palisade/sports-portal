@@ -6,9 +6,8 @@
 </head>
 <body>
 
-<!-- ===== Top Bar ===== -->
 <div class="navbar">
-    <h1>🏏 Sports Portal</h1>
+    <h1>Sports Portal</h1>
     <div class="nav-right">
         <span id="username-label"></span>
         <span id="role-badge" class="role-badge"></span>
@@ -16,7 +15,6 @@
     </div>
 </div>
 
-<!-- ===== Top Tabs ===== -->
 <div class="top-tabs">
     <button class="nav-btn" data-tab="tab-members" onclick="switchTab('tab-members')">Members</button>
     <button class="nav-btn" data-tab="tab-photos" onclick="switchTab('tab-photos')">Photos</button>
@@ -26,7 +24,6 @@
 
 <div class="dashboard">
 
-    <!-- ===== HOME ===== -->
     <div id="tab-home" class="tab-panel">
         <h1>Welcome back!</h1>
         <div class="card">
@@ -39,7 +36,6 @@
         </div>
     </div>
 
-    <!-- ===== SCHEDULE ===== -->
     <div id="tab-schedule" class="tab-panel" style="display:none;">
         <h1>Schedule</h1>
         <div class="card">
@@ -48,36 +44,31 @@
         </div>
     </div>
 
-    <!-- ===== MESSAGES ===== -->
     <div id="tab-messages" class="tab-panel" style="display:none;">
         <h1>Messages</h1>
         <div id="messages-list"></div>
     </div>
 
-    <!-- ===== MEMBERS ===== -->
     <div id="tab-members" class="tab-panel" style="display:none;">
         <h1>Members</h1>
         <div id="roster-view"></div>
     </div>
 
-    <!-- ===== PHOTOS ===== -->
     <div id="tab-photos" class="tab-panel" style="display:none;">
         <h1>Photos</h1>
-        <div class="card"><p>No photos uploaded yet. Check back after the next match!</p></div>
+        <div id="photos-grid" class="photos-grid"></div>
     </div>
 
-    <!-- ===== TEAM INFO ===== -->
     <div id="tab-teaminfo" class="tab-panel" style="display:none;">
         <h1>Team Info</h1>
         <div class="card">
             <h3>Senior Cricket Squad</h3>
             <p>Home Ground: Central Oval</p>
-            <p>Training: Tuesdays & Thursdays, 5:30 PM</p>
+            <p>Training: Tuesdays &amp; Thursdays, 5:30 PM</p>
             <p>Coach: coach1</p>
         </div>
     </div>
 
-    <!-- ===== FEES ===== -->
     <div id="tab-fees" class="tab-panel" style="display:none;">
         <h1>My Fees</h1>
         <div class="card">
@@ -85,7 +76,6 @@
         </div>
     </div>
 
-    <!-- ===== PROFILE (You) ===== -->
     <div id="tab-profile" class="tab-panel" style="display:none;">
         <h1>Profile</h1>
 
@@ -103,12 +93,11 @@
         </div>
 
         <div class="card">
-            <h3>Help & Support</h3>
-            <button onclick="switchTab('tab-help')">About, Help & Logout</button>
+            <h3>Help &amp; Support</h3>
+            <button onclick="switchTab('tab-help')">About, Help &amp; Logout</button>
         </div>
     </div>
 
-    <!-- ===== EDIT PROFILE ===== -->
     <div id="tab-edit-profile" class="tab-panel" style="display:none;">
         <h1>Edit Profile</h1>
         <div class="card">
@@ -142,7 +131,6 @@
         </div>
     </div>
 
-    <!-- ===== SETTINGS ===== -->
     <div id="tab-settings" class="tab-panel" style="display:none;">
         <h1>Settings</h1>
         <div class="card">
@@ -164,9 +152,8 @@
         </div>
     </div>
 
-    <!-- ===== HELP & SUPPORT ===== -->
     <div id="tab-help" class="tab-panel" style="display:none;">
-        <h1>Help & Support</h1>
+        <h1>Help &amp; Support</h1>
         <div class="card">
             <h3>About App</h3>
             <p>Sports Portal — Cricket Management System. Built as a Year 12 Software Engineering major project.</p>
@@ -182,7 +169,6 @@
 
 </div>
 
-<!-- ===== Bottom Nav ===== -->
 <div class="bottom-nav">
     <button class="nav-btn active" data-tab="tab-home" onclick="switchTab('tab-home')">Home</button>
     <button class="nav-btn" data-tab="tab-schedule" onclick="switchTab('tab-schedule')">Schedule</button>
@@ -201,22 +187,16 @@
     renderMessages();
     renderPlayerProfile();
     renderSettings();
+    renderPhotos();
 
-    // Simple read-only roster for "Members" tab
     (function renderRosterView() {
         const container = document.getElementById("roster-view");
         const players = getData("players");
-        container.innerHTML = players.map(p => `
-            <div class="card"><h3>${p.name}</h3></div>
-        `).join("");
+        container.innerHTML = players.map(function(p) {
+            return '<div class="card"><h3>' + p.name + '</h3></div>';
+        }).join("");
     })();
 </script>
 
 </body>
 </html>
-
-<!-- ===== PHOTOS ===== -->
-<div id="tab-photos" class="tab-panel" style="display:none;">
-    <h1>Photos</h1>
-    <div id="photos-grid" class="photos-grid"></div>
-</div>
