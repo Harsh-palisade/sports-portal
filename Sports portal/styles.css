@@ -279,7 +279,326 @@ button:active {
         radial-gradient(circle at 20% 20%, rgba(244,196,48,0.08), transparent 40%),
         radial-gradient(circle at 80% 80%, rgba(30,58,138,0.15), transparent 40%),
         linear-gradient(160deg, #0b3d2e 0%, #082419 100%);
+    padding:/* ===== Base ===== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+    color: #1a1a2e;
+    min-height: 100vh;
+}
+
+h1, h2, h3 {
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* ===== Logo ===== */
+.logo {
+    width: 90px;
+    height: auto;
+    margin-bottom: 12px;
+}
+
+/* ===== Login Page ===== */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #eef2ff 0%, #f4f6f9 100%);
     padding: 20px;
+}
+
+.login-container {
+    width: 360px;
+    padding: 40px 32px;
+    background: #ffffff;
+    text-align: center;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(30, 58, 138, 0.12);
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-title {
+    font-size: 26px;
+    margin: 10px 0 2px;
+    color: #1e3a8a;
+}
+
+.login-subtitle {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.login-form {
+    text-align: left;
+}
+
+.input-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    margin: 14px 0 4px;
+    font-weight: 600;
+}
+
+.login-footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* ===== Landing page container (index.html reuses login-container) ===== */
+.login-container h1 {
+    font-size: 26px;
+    color: #1e3a8a;
+    margin: 10px 0 5px;
+}
+
+.login-container p {
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+/* ===== Inputs ===== */
+input, select {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 4px 0;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+    font-size: 14px;
+    color: #1a1a2e;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    background: #ffffff;
+}
+
+/* ===== Buttons ===== */
+button {
+    width: 100%;
+    padding: 13px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* ===== Navbar ===== */
+.navbar {
+    background: #ffffff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-bottom: 1px solid #eef0f3;
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 19px;
+    color: #1e3a8a;
+}
+
+.navbar .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.navbar button {
+    width: auto;
+    padding: 8px 16px;
+    margin: 0;
+    font-size: 13px;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.navbar button:hover {
+    background: #e5e7eb;
+    box-shadow: none;
+    transform: none;
+}
+
+#username-label {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* ===== Top Tabs ===== */
+.top-tabs {
+    display: flex;
+    background: #ffffff;
+    padding: 10px 20px;
+    gap: 8px;
+    overflow-x: auto;
+    border-bottom: 1px solid #eef0f3;
+}
+
+/* ===== Bottom Nav ===== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: #ffffff;
+    padding: 10px 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+    border-top: 1px solid #eef0f3;
+    z-index: 100;
+}
+
+/* ===== Nav buttons (top tabs + bottom nav) ===== */
+.nav-btn {
+    width: auto;
+    background: transparent;
+    color: #6b7280;
+    border: none;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 0;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: #eef2ff;
+    color: #2563eb;
+    transform: none;
+    box-shadow: none;
+}
+
+.nav-btn.active {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+/* ===== Dashboard ===== */
+.dashboard {
+    padding: 24px;
+    padding-bottom: 90px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.dashboard h1 {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #1a1a2e;
+}
+
+/* ===== Cards ===== */
+.card {
+    background: #ffffff;
+    padding: 20px;
+    margin: 14px 0;
+    border-radius: 14px;
+    border-left: 4px solid #2563eb;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #1a1a2e;
+    font-size: 17px;
+}
+
+.card p {
+    color: #4b5563;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+.card label {
+    display: block;
+    text-align: left;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 12px;
+    margin-bottom: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.card hr {
+    border: none;
+    border-top: 1px solid #eef0f3;
+    margin: 16px 0;
+}
+
+.card small {
+    display: block;
+    margin-top: 6px;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* ===== Match items ===== */
+.match-item {
+    background: #f9fafb;
+    padding: 14px;
+    border-radius: 10px;
+    margin: 8px 0;
+    line-height: 1.6;
+    border: 1px solid #eef0f3;
+}
+
+/* ===== Role Badge ===== */
+.role-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #eef2ff;
+    color: #2563eb;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+} 20px;
 }
 
 .login-page .login-container {
