@@ -11,7 +11,7 @@
     <div class="split-brand">
         <div class="brand-content">
             <img src="assets/logo.png" class="logo" alt="logo">
-            <h1 class="brand-title">🏏 Sports Portal</h1>
+            <h1 class="brand-title"> Sports Portal</h1>
             <p class="brand-tagline">Manage your team, matches, and fees — all in one place.</p>
         </div>
         <div class="brand-blob blob1"></div>
@@ -110,7 +110,7 @@ function renderTeamOverviewCoach() {
     const container = document.getElementById("team-overview-stats");
     if (!container) return;
     const o = getTeamOverview();
-    container.innerHTML = `
+    container.innerHTML =
         <div class="stat-card"><div class="stat-number">${o.totalPlayers}</div><div class="stat-label">Players</div></div>
         <div class="stat-card"><div class="stat-number">${o.upcomingMatches}</div><div class="stat-label">Matches</div></div>
         <div class="stat-card"><div class="stat-number">${o.feesPaid}</div><div class="stat-label">Fees Paid</div></div>

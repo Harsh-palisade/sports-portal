@@ -484,3 +484,127 @@ button:active {
     color: #9ca3af;
     font-size: 11px;
 }
+
+/* ===== Home Hero Banner ===== */
+.home-hero {
+    background: linear-gradient(135deg, #166534 0%, #22c55e 100%);
+    border-radius: 18px;
+    padding: 28px 24px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.home-hero::after {
+    content: "";
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    top: -80px;
+    right: -60px;
+}
+
+.home-hero h1 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.home-hero p {
+    margin: 0;
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== Colorful Stat Cards ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 18px 14px;
+    text-align: center;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    border-top: none;
+    transition: transform 0.15s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.stat-icon {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1a2e;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 2px;
+}
+
+.stat-card.c-green { border-bottom: 3px solid #22c55e; }
+.stat-card.c-blue { border-bottom: 3px solid #3b82f6; }
+.stat-card.c-gold { border-bottom: 3px solid #f4c430; }
+.stat-card.c-red { border-bottom: 3px solid #ef4444; }
+
+/* ===== Quick Actions ===== */
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.quick-action-btn {
+    flex: 1;
+    min-width: 130px;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: #1a1a2e;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.quick-action-btn:hover {
+    background: #ecfdf5;
+    border-color: #22c55e;
+    transform: translateY(-2px);
+}
+
+.quick-action-icon {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* ===== Announcement feed items ===== */
+.announcement-feed .card {
+    border-left: 3px solid #f4c430;
+}
+

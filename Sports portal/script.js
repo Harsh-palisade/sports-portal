@@ -574,3 +574,97 @@ function sendPlayerMessage() {
 
 // Run expansions on load
 ensureMorePlayers();
+
+// ===== EXPAND ANNOUNCEMENTS (adds more if fewer than 20 exist) =====
+function ensureMoreAnnouncements() {
+    let items = getData("announcements");
+    if (items.length >= 20) return;
+
+    const extra = [
+        "Nets booked for Wednesday evening, all welcome.",
+        "New team kit sponsor confirmed — jerseys arriving next month.",
+        "Congratulations to the U16s on their tournament win!",
+        "Reminder: fill in your availability for next month's fixtures.",
+        "Pre-season fitness testing scheduled for next weekend.",
+        "Club AGM will be held in the clubhouse, all parents welcome.",
+        "New scoring app rollout — training session on how to use it.",
+        "Ground maintenance means no training this Friday.",
+        "Player of the Month voting is now open.",
+        "First aid kits have been restocked in the clubhouse.",
+        "Please return all borrowed training gear by Sunday.",
+        "End of season presentation night — date to be confirmed.",
+        "New assistant coach joining the squad next week.",
+        "Reminder to bring water bottles — hot weather forecast.",
+        "Car park will be closed for resurfacing this weekend.",
+        "Sponsorship packs available for anyone interested in helping the club.",
+        "Nutrition workshop for players and parents next Tuesday.",
+        "Under-13s trial dates have been posted on the noticeboard.",
+        "Please label all personal equipment clearly.",
+        "Thank you to all volunteers who helped at the weekend BBQ!"
+    ];
+
+    let counter = items.length + 1;
+    extra.forEach((text, i) => {
+        if (items.length >= 20) return;
+        const daysAgo = i + 1;
+        const d = new Date();
+        d.setDate(d.getDate() - daysAgo);
+        items.push({
+            id: "a" + counter,
+            text,
+            date: d.toISOString().split("T")[0]
+        });
+        counter++;
+    });
+
+    saveData("announcements", items);
+}
+
+// ===== TEAM OVERVIEW STATS (icon/color version, used on Home tabs) =====
+function getTeamOverview() {
+    const players = getData("players");
+    const matches = getData("matches");
+    const totalPlayers = players.length;
+    const feesPaid = players.filter(p => p.fees.paid).length;
+    const feesUnpaid = totalPlayers - feesPaid;
+    const totalRuns = players.reduce((sum, p) => sum + p.stats.runs, 0);
+    const totalWickets = players.reduce((sum, p) => sum + p.stats.wickets, 0);
+    return { totalPlayers, feesPaid, feesUnpaid, totalRuns, totalWickets, upcomingMatches: matches.length };
+}
+
+function renderTeamOverviewCoach() {
+    const container = document.getElementById("team-overview-stats");
+    if (!container) return;
+    const o = getTeamOverview();
+    container.innerHTML = `
+        <div class="stat-card c-green"><div class="stat-icon">👥</div><div class="stat-number">${o.totalPlayers}</div><div class="stat-label">Players</div></div>
+        <div class="stat-card c-blue"><div class="stat-icon">📅</div><div class="stat-number">${o.upcomingMatches}</div><div class="stat-label">Matches</div></div>
+        <div class="stat-card c-gold"><div class="stat-icon">✅</div><div class="stat-number">${o.feesPaid}</div><div class="stat-label">Fees Paid</div></div>
+        <div class="stat-card c-red"><div class="stat-icon">⚠️</div><div class="stat-number">${o.feesUnpaid}</div><div class="stat-label">Unpaid</div></div>
+    `;
+}
+
+function renderRecentAnnouncementsHome(limit) {
+    const container = document.getElementById("home-announcements");
+    if (!container) return;
+    const items = getData("announcements").slice(0, limit || 5);
+    container.innerHTML = items.length ? items.map(a => `
+        <div class="card"><p>${a.text}</p><small>${a.date}</small></div>
+    `).join("") : "<p>No announcements yet.</p>";
+}
+
+function renderMyStatsGrid() {
+    const container = document.getElementById("my-stats-grid");
+    if (!container) return;
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    if (!player) return;
+    container.innerHTML = `
+        <div class="stat-card c-green"><div class="stat-icon">🏏</div><div class="stat-number">${player.stats.matches}</div><div class="stat-label">Matches</div></div>
+        <div class="stat-card c-blue"><div class="stat-icon">🏃</div><div class="stat-number">${player.stats.runs}</div><div class="stat-label">Runs</div></div>
+        <div class="stat-card c-gold"><div class="stat-icon">🎯</div><div class="stat-number">${player.stats.wickets}</div><div class="stat-label">Wickets</div></div>
+    `;
+}
+
+// Run on load
+ensureMoreAnnouncements();

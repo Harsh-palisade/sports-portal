@@ -24,17 +24,14 @@
 
 <div class="dashboard">
 
-    <div id="tab-home" class="tab-panel">
-        <h1>Welcome back!</h1>
-        <div class="card">
-            <h3>Child Overview</h3>
-            <div id="my-stats"></div>
-        </div>
-        <div class="card">
-            <h3>Latest Announcement</h3>
-            <div id="announcements-list"></div>
-        </div>
+<div id="tab-home" class="tab-panel">
+    <h1>Welcome back!</h1>
+    <div class="stats-grid" id="my-stats-grid"></div>
+    <div class="card">
+        <h3>Latest Announcement</h3>
+        <div id="home-announcements"></div>
     </div>
+</div>
 
     <div id="tab-schedule" class="tab-panel" style="display:none;">
         <h1>Schedule</h1>
@@ -126,27 +123,33 @@
     renderMessages();
     renderPhotos();
 
-    (function renderChildStats() {
-        const linkedId = localStorage.getItem("linkedPlayerId");
-        const player = getData("players").find(p => p.id === linkedId);
-        const container = document.getElementById("my-stats");
-        if (player && container) {
-            container.innerHTML = "<p>" + player.name + " — Matches: " + player.stats.matches + " | Runs: " + player.stats.runs + " | Wickets: " + player.stats.wickets + "</p>";
-        }
-        const nameLabel = document.getElementById("linked-child-name");
-        if (player && nameLabel) nameLabel.textContent = player.name;
-    })();
+(function renderChildStatsGrid() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    const container = document.getElementById("my-stats-grid");
+    if (player && container) {
+        container.innerHTML = `
+            <div class="stat-card"><div class="stat-number">${player.stats.matches}</div><div class="stat-label">Matches</div></div>
+            <div class="stat-card"><div class="stat-number">${player.stats.runs}</div><div class="stat-label">Runs</div></div>
+            <div class="stat-card"><div class="stat-number">${player.stats.wickets}</div><div class="stat-label">Wickets</div></div>
+        `;
+    }
+    const nameLabel = document.getElementById("linked-child-name");
+    if (player && nameLabel) nameLabel.textContent = player.name;
+})();
 
-    const label2 = document.getElementById("username-label-2");
-    if (label2) label2.textContent = "Username: " + localStorage.getItem("loggedInUser");
+renderRecentAnnouncementsHome(5);
 
-    (function renderRosterView() {
-        const container = document.getElementById("roster-view");
-        const players = getData("players");
-        container.innerHTML = players.map(function(p) {
-            return '<div class="card"><h3>' + p.name + '</h3></div>';
-        }).join("");
-    })();
+const label2 = document.getElementById("username-label-2");
+if (label2) label2.textContent = "Username: " + localStorage.getItem("loggedInUser");
+
+(function renderRosterView() {
+    const container = document.getElementById("roster-view");
+    const players = getData("players");
+    container.innerHTML = players.map(function(p) {
+        return '<div class="card"><h3>' + p.name + '</h3></div>';
+    }).join("");
+})();
 </script>
 
 </body>

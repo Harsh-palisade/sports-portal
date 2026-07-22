@@ -26,18 +26,38 @@
 
 <div class="dashboard">
 
-    <!-- ===== HOME ===== -->
-    <div id="tab-home" class="tab-panel">
-        <h1>Coach Home</h1>
-        <div class="card">
-            <h3>Team Overview</h3>
-            <p>Manage training, players, and matches from the tabs above and below.</p>
+   <div id="tab-home" class="tab-panel">
+    <div class="home-hero">
+        <h1 id="hero-greeting">Welcome back, Coach</h1>
+        <p>Here's what's happening with your team today.</p>
+    </div>
+
+    <div class="stats-grid" id="team-overview-stats"></div>
+
+    <div class="quick-actions">
+        <div class="quick-action-btn" onclick="switchTab('tab-schedule')">
+            <span class="quick-action-icon">📅</span>
+            Add Match
         </div>
-        <div class="card">
-            <h3>Latest Announcements</h3>
-            <div id="announcements-list"></div>
+        <div class="quick-action-btn" onclick="switchTab('tab-members')">
+            <span class="quick-action-icon">➕</span>
+            Add Player
+        </div>
+        <div class="quick-action-btn" onclick="switchTab('tab-fees')">
+            <span class="quick-action-icon">💰</span>
+            Manage Fees
+        </div>
+        <div class="quick-action-btn" onclick="switchTab('tab-messages')">
+            <span class="quick-action-icon">💬</span>
+            Chat
         </div>
     </div>
+
+    <div class="card announcement-feed">
+        <h3>Latest Announcements</h3>
+        <div id="home-announcements"></div>
+    </div>
+</div>
 
     <!-- ===== SCHEDULE ===== -->
     <div id="tab-schedule" class="tab-panel" style="display:none;">
@@ -158,5 +178,3 @@
     if (label2) label2.textContent = "Username: " + localStorage.getItem("loggedInUser");
 </script>
 
-</body>
-</html>
