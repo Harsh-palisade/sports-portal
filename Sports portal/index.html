@@ -11,7 +11,7 @@
     <div class="split-brand">
         <div class="brand-content">
             <img src="assets/logo.png" class="logo" alt="logo">
-            <h1 class="brand-title">Sports Portal</h1>
+            <h1 class="brand-title">🏏 Sports Portal</h1>
             <p class="brand-tagline">Manage your team, matches, and fees — all in one place.</p>
         </div>
         <div class="brand-blob blob1"></div>
@@ -29,7 +29,6 @@
                     <option value="coach">Coach</option>
                     <option value="parent">Parent</option>
                     <option value="player">Player</option>
-                    <option value="staff">Staff</option>
                 </select>
 
                 <label class="input-label">Username</label>
@@ -38,49 +37,13 @@
                 <label class="input-label">Password</label>
                 <input type="password" id="password" placeholder="Enter your password">
 
-                <button id="login-btn">Login</button>
-
-                <!-- live notifications area -->
-                <div id="login-notifications" class="notifications"></div>
+                <button onclick="login()">Login</button>
             </div>
 
             <p class="login-footer">Enter your team credentials to continue</p>
         </div>
     </div>
 
-</div>
-
-<!-- Coach members tab (shown after coach login) -->
-<div id="tab-members" class="tab-panel" style="display:none;">
-    <h1>Members</h1>
-    <div class="card">
-        <div class="filter-bar">
-            <input type="text" id="member-search" placeholder="Search by name..." oninput="renderRosterFiltered()">
-            <select id="member-grade-filter" onchange="renderRosterFiltered()">
-                <option value="all">All Grades</option>
-                <option value="1">Grade 1</option>
-                <option value="2">Grade 2</option>
-                <option value="3">Grade 3</option>
-                <option value="4">Grade 4</option>
-                <option value="5">Grade 5</option>
-                <option value="6">Grade 6</option>
-            </select>
-        </div>
-        <div id="roster-list"></div>
-        <hr>
-        <h3>Add New Player</h3>
-        <input type="text" id="new-player-name" placeholder="Player name">
-        <input type="text" id="new-player-password" placeholder="Initial password (min 6 chars)">
-        <select id="new-player-grade">
-            <option value="1">Grade 1</option>
-            <option value="2">Grade 2</option>
-            <option value="3">Grade 3</option>
-            <option value="4">Grade 4</option>
-            <option value="5">Grade 5</option>
-            <option value="6">Grade 6</option>
-        </select>
-        <button onclick="addPlayer()">Add Player</button>
-    </div>
 </div>
 
 <script src="script.js"></script>

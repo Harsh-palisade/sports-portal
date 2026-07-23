@@ -1,121 +1,22 @@
-// ===== CONFIG =====
-const MIN_PASSWORD_LENGTH = 6;
-const MAX_LOGIN_ATTEMPTS = 5;
-
-// ===== STORAGE HELPERS =====
-function getData(key) {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : [];
-}
-
-function saveData(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-}
-
-// ===== INITIAL SEED =====
+// ===== SEED DATA (only runs once) =====
 function initData() {
     if (localStorage.getItem("dataInitialized")) return;
 
-    const users = [
-        {
-            username: "coach1",
-            password: "coach123",
-            role: "coach",
-            active: true,
-            locked: false,
-            failedAttempts: 0,
-            profile: {
-                grade: null,
-                emergencyContact: "Club admin",
-                disabilities: "None",
-                medical: "None",
-                finance: "N/A",
-                trainingTime: "Mon/Wed 5–7pm",
-                behaviourIndex: 90,
-                disabilitiesIndex: 0
-            },
-            stats: {
-                avgBowlingSpeed: 0,
-                wickets: 0,
-                runs: 0,
-                battingAverage: 0
-            }
-        },
-        {
-            username: "player1",
-            password: "player123",
-            role: "player",
-            active: true,
-            locked: false,
-            failedAttempts: 0,
-            profile: {
-                grade: 3,
-                emergencyContact: "Parent B – 0400 111 111",
-                disabilities: "Mild dyslexia",
-                medical: "No major issues",
-                finance: "Fees pending",
-                trainingTime: "Tue/Thu 4–6pm",
-                behaviourIndex: 75,
-                disabilitiesIndex: 20
-            },
-            stats: {
-                avgBowlingSpeed: 95,
-                wickets: 10,
-                runs: 300,
-                battingAverage: 28
-            }
-        },
-        {
-            username: "parent1",
-            password: "parent123",
-            role: "parent",
-            active: true,
-            locked: false,
-            failedAttempts: 0,
-            profile: {
-                grade: null,
-                emergencyContact: "Self",
-                disabilities: "None",
-                medical: "None",
-                finance: "Fees partially paid",
-                trainingTime: "N/A",
-                behaviourIndex: null,
-                disabilitiesIndex: null
-            },
-            stats: {}
-        },
-        {
-            username: "staff1",
-            password: "staff123",
-            role: "staff",
-            active: true,
-            locked: false,
-            failedAttempts: 0,
-            profile: {
-                grade: null,
-                emergencyContact: "Club admin",
-                disabilities: "None",
-                medical: "None",
-                finance: "N/A",
-                trainingTime: "Office hours",
-                behaviourIndex: null,
-                disabilitiesIndex: null
-            },
-            stats: {}
-        }
+    const coach = { username: "coach1", password: "coach123" };
+
+    const players = [
+        { id: "p1", username: "player1", password: "player123", name: "Alex Johnson",
+          fees: { amount: 150, paid: false },
+          stats: { matches: 5, runs: 120, wickets: 3 } },
+        { id: "p2", username: "player2", password: "player123", name: "Sam Lee",
+          fees: { amount: 150, paid: true },
+          stats: { matches: 6, runs: 95, wickets: 8 } }
     ];
 
-    const players = users
-        .filter(u => u.role === "player")
-        .map(u => ({
-            username: u.username,
-            name: u.username,
-            grade: u.profile.grade || 1,
-            fees: { amount: 150, paid: u.profile.finance === "Fees paid" },
-            stats: u.stats,
-            behaviourIndex: u.profile.behaviourIndex,
-            disabilitiesIndex: u.profile.disabilitiesIndex
-        }));
+    const parents = [
+        { username: "parent1", password: "parent123", childId: "p1" },
+        { username: "parent2", password: "parent123", childId: "p2" }
+    ];
 
     const matches = [
         { id: "m1", opponent: "Riverdale CC", date: "2026-07-20", venue: "Central Oval" },
@@ -126,243 +27,550 @@ function initData() {
         { id: "a1", text: "Training moved to Thursday this week.", date: "2026-07-10" }
     ];
 
-    saveData("users", users);
-    saveData("players", players);
-    saveData("matches", matches);
-    saveData("announcements", announcements);
-    saveData("auditLog", []);
-    saveData("interviews", []);
-    saveData("preferences", []);
-    saveData("polls", []);
-    saveData("loginAttempts", []);
-
+    localStorage.setItem("coach", JSON.stringify(coach));
+    localStorage.setItem("players", JSON.stringify(players));
+    localStorage.setItem("parents", JSON.stringify(parents));
+    localStorage.setItem("matches", JSON.stringify(matches));
+    localStorage.setItem("announcements", JSON.stringify(announcements));
     localStorage.setItem("dataInitialized", "true");
 }
 
-// ===== ALWAYS ENSURE COACH EXISTS =====
-function ensureCoachAccount() {
-    const users = getData("users");
-    let coach = users.find(u => u.role === "coach" && u.username === "coach1");
-    if (!coach) {
-        users.push({
-            username: "coach1",
-            password: "coach123",
-            role: "coach",
-            active: true,
-            locked: false,
-            failedAttempts: 0,
-            profile: {},
-            stats: {}
-        });
-        saveData("users", users);
-    }
-}
+function getData(key) { return JSON.parse(localStorage.getItem(key)) || []; }
+function saveData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
-// ===== ANNOUNCEMENTS FIX =====
-function ensureMoreAnnouncements() {
-    let items = getData("announcements");
-    if (items.length >= 20) return;
-
-    const extra = [
-        "Nets booked for Wednesday evening, all welcome.",
-        "New team kit sponsor confirmed — jerseys arriving next month.",
-        "Congratulations to the U16s on their tournament win!",
-        "Reminder: fill in your availability for next month's fixtures.",
-        "Pre-season fitness testing scheduled for next weekend.",
-        "Club AGM will be held in the clubhouse, all parents welcome.",
-        "New scoring app rollout — training session on how to use it.",
-        "Ground maintenance means no training this Friday.",
-        "Player of the Month voting is now open.",
-        "First aid kits have been restocked in the clubhouse.",
-        "Please return all borrowed training gear by Sunday.",
-        "End of season presentation night — date to be confirmed.",
-        "New assistant coach joining the squad next week.",
-        "Reminder to bring water bottles — hot weather forecast.",
-        "Car park will be closed for resurfacing this weekend.",
-        "Sponsorship packs available for anyone interested in helping the club.",
-        "Nutrition workshop for players and parents next Tuesday.",
-        "Under-13s trial dates have been posted on the noticeboard.",
-        "Please label all personal equipment clearly.",
-        "Thank you to all volunteers who helped at the weekend BBQ!"
-    ];
-
-    let counter = items.length + 1;
-    extra.forEach((text, i) => {
-        if (items.length >= 20) return;
-        const daysAgo = i + 1;
-        const d = new Date();
-        d.setDate(d.getDate() - daysAgo);
-        items.push({
-            id: "a" + counter,
-            text,
-            date: d.toISOString().split("T")[0]
-        });
-        counter++;
-    });
-
-    saveData("announcements", items);
-}
-
-// ===== LOGIN SECURITY =====
-function showNotification(message, type = "info") {
-    const box = document.getElementById("login-notifications");
-    if (!box) return;
-    const div = document.createElement("div");
-    div.className = `notification ${type}`;
-    div.textContent = message;
-    box.appendChild(div);
-    setTimeout(() => div.remove(), 5000);
-}
-
-function getAttemptsFor(username) {
-    const attempts = getData("loginAttempts");
-    const entry = attempts.find(a => a.username === username);
-    return entry ? entry.count : 0;
-}
-
-function setAttemptsFor(username, count) {
-    let attempts = getData("loginAttempts");
-    const entry = attempts.find(a => a.username === username);
-    if (entry) {
-        entry.count = count;
-    } else {
-        attempts.push({ username, count });
-    }
-    saveData("loginAttempts", attempts);
-}
-
-function findAccount(role, username) {
-    const users = getData("users");
-    return users.find(u => u.username === username && u.role === role);
-}
-
-function persistAccount(user) {
-    const users = getData("users");
-    const idx = users.findIndex(u => u.username === user.username && u.role === user.role);
-    if (idx !== -1) {
-        users[idx] = user;
-        saveData("users", users);
-    }
-}
-
+// ===== LOGIN / SESSION =====
 function login() {
     const role = document.getElementById("role").value;
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if (!username || !password) {
-        showNotification("Please fill all fields.", "error");
+    if (username === "" || password === "") {
+        alert("Please fill all fields");
         return;
     }
 
-    if (password.length < MIN_PASSWORD_LENGTH) {
-        showNotification(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`, "error");
-        return;
+    let success = false;
+    let linkedPlayerId = null;
+
+    if (role === "coach") {
+        const coach = JSON.parse(localStorage.getItem("coach"));
+        success = (username === coach.username && password === coach.password);
     }
 
-    let account = findAccount(role, username);
-
-    if (!account) {
-        showNotification("Incorrect username or role.", "error");
-        return;
+    if (role === "parent") {
+        const parent = getData("parents").find(p => p.username === username && p.password === password);
+        if (parent) { success = true; linkedPlayerId = parent.childId; }
     }
 
-    if (!account.active) {
-        showNotification("This account has been disabled.", "error");
-        return;
+    if (role === "player") {
+        const player = getData("players").find(p => p.username === username && p.password === password);
+        if (player) { success = true; linkedPlayerId = player.id; }
     }
 
-    if (account.locked) {
-        showNotification("Account locked due to too many failed attempts.", "error");
+    if (!success) {
+        alert("Incorrect username or password for " + role);
         return;
     }
-
-    const attempts = getAttemptsFor(username);
-    if (attempts >= MAX_LOGIN_ATTEMPTS) {
-        account.locked = true;
-        persistAccount(account);
-        showNotification("Account locked due to too many failed attempts.", "error");
-        return;
-    }
-
-    if (account.password !== password) {
-        const newAttempts = attempts + 1;
-        setAttemptsFor(username, newAttempts);
-        if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
-            account.locked = true;
-            persistAccount(account);
-            showNotification("Account locked due to too many failed attempts.", "error");
-        } else {
-            showNotification(`Incorrect password. Attempts: ${newAttempts}/${MAX_LOGIN_ATTEMPTS}`, "error");
-        }
-        return;
-    }
-
-    // success
-    setAttemptsFor(username, 0);
-    account.failedAttempts = 0;
-    persistAccount(account);
 
     localStorage.setItem("loggedInRole", role);
     localStorage.setItem("loggedInUser", username);
+    if (linkedPlayerId) localStorage.setItem("linkedPlayerId", linkedPlayerId);
+    else localStorage.removeItem("linkedPlayerId");
 
-    window.location.href = role + "-dashboard.html";
+    window.location.href = "dashboard." + role + ".html";
 }
 
-// ===== SESSION / NAVBAR / PERMISSIONS =====
 function requireLogin(expectedRole) {
     const role = localStorage.getItem("loggedInRole");
-    const user = localStorage.getItem("loggedInUser");
-    if (!role || !user || (expectedRole && role !== expectedRole)) {
-        window.location.href = "index.html";
+    if (!role || role !== expectedRole) {
+        alert("Please log in to view this page.");
+        window.location.href = "login.html";
     }
-}
-
-function renderNavbar() {
-    const role = localStorage.getItem("loggedInRole");
-    const user = localStorage.getItem("loggedInUser");
-    const badge = document.getElementById("role-badge");
-    const label = document.getElementById("username-label");
-    if (badge) badge.textContent = role ? role.charAt(0).toUpperCase() + role.slice(1) : "";
-    if (label) label.textContent = user || "";
 }
 
 function logout() {
     localStorage.removeItem("loggedInRole");
     localStorage.removeItem("loggedInUser");
-    window.location.href = "index.html";
+    localStorage.removeItem("linkedPlayerId");
+    window.location.href = "login.html";
 }
 
-function applyPermissions() {
+// ===== NAVBAR =====
+function renderNavbar() {
     const role = localStorage.getItem("loggedInRole");
-    document.querySelectorAll(".menu-item").forEach(item => {
-        const allowed = (item.getAttribute("data-role") || "all").split(",");
-        if (!allowed.includes("all") && !allowed.includes(role)) {
-            item.style.display = "none";
+    const username = localStorage.getItem("loggedInUser");
+    const badge = document.getElementById("role-badge");
+    const userLabel = document.getElementById("username-label");
+    if (badge && role) badge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+    if (userLabel && username) userLabel.textContent = username;
+}
+
+// ===== MATCHES =====
+function renderMatches() {
+    const container = document.getElementById("matches-list");
+    if (!container) return;
+    const matches = getData("matches");
+    container.innerHTML = matches.length ? matches.map(m => `
+        <div class="match-item"><strong>vs ${m.opponent}</strong><br>📅 ${m.date} &nbsp; 📍 ${m.venue}</div>
+    `).join("") : "<p>No matches scheduled yet.</p>";
+}
+
+function addMatch() {
+    const opponent = document.getElementById("new-opponent").value.trim();
+    const date = document.getElementById("new-date").value;
+    const venue = document.getElementById("new-venue").value.trim();
+    if (!opponent || !date || !venue) { alert("Fill all match fields"); return; }
+
+    const matches = getData("matches");
+    matches.push({ id: "m" + Date.now(), opponent, date, venue });
+    saveData("matches", matches);
+    renderMatches();
+    document.getElementById("new-opponent").value = "";
+    document.getElementById("new-date").value = "";
+    document.getElementById("new-venue").value = "";
+}
+
+// ===== FEES =====
+function renderFeesCoach() {
+    const container = document.getElementById("fees-list");
+    if (!container) return;
+    const players = getData("players");
+    container.innerHTML = players.map(p => `
+        <div class="card">
+            <h3>${p.name}</h3>
+            <p>Fee: $${p.fees.amount} — Status:
+                <strong style="color:${p.fees.paid ? '#7CFC00' : '#ff6b6b'}">
+                    ${p.fees.paid ? 'Paid' : 'Unpaid'}
+                </strong>
+            </p>
+            <button onclick="toggleFee('${p.id}')">
+                Mark as ${p.fees.paid ? 'Unpaid' : 'Paid'}
+            </button>
+        </div>
+    `).join("");
+}
+
+function toggleFee(playerId) {
+    const players = getData("players");
+    const player = players.find(p => p.id === playerId);
+    player.fees.paid = !player.fees.paid;
+    saveData("players", players);
+    renderFeesCoach();
+}
+
+function renderFeeForLinkedPlayer() {
+    const container = document.getElementById("fee-status");
+    if (!container) return;
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    if (!player) return;
+    container.innerHTML = `
+        <p>Fee amount: $${player.fees.amount}</p>
+        <p>Status: <strong style="color:${player.fees.paid ? '#7CFC00' : '#ff6b6b'}">
+            ${player.fees.paid ? 'Paid' : 'Unpaid'}
+        </strong></p>
+    `;
+}
+
+// ===== ROSTER (coach only) =====
+function renderRoster() {
+    const container = document.getElementById("roster-list");
+    if (!container) return;
+    const players = getData("players");
+    container.innerHTML = players.map(p => `
+        <div class="card">
+            <h3>${p.name}</h3>
+            <p>Matches: ${p.stats.matches} | Runs: ${p.stats.runs} | Wickets: ${p.stats.wickets}</p>
+            <button onclick="removePlayer('${p.id}')">Remove Player</button>
+        </div>
+    `).join("");
+}
+
+function addPlayer() {
+    const name = document.getElementById("new-player-name").value.trim();
+    if (!name) { alert("Enter a player name"); return; }
+    const players = getData("players");
+    const id = "p" + Date.now();
+    players.push({ id, username: "player" + Date.now(), password: "changeme",
+        name, fees: { amount: 150, paid: false }, stats: { matches: 0, runs: 0, wickets: 0 } });
+    saveData("players", players);
+    renderRoster();
+    document.getElementById("new-player-name").value = "";
+}
+
+function removePlayer(playerId) {
+    let players = getData("players");
+    players = players.filter(p => p.id !== playerId);
+    saveData("players", players);
+    renderRoster();
+}
+
+// ===== STATS (own player, for player dashboard) =====
+function renderOwnStats() {
+    const container = document.getElementById("my-stats");
+    if (!container) return;
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    if (!player) return;
+    container.innerHTML = `
+        <p>Matches played: ${player.stats.matches}</p>
+        <p>Runs scored: ${player.stats.runs}</p>
+        <p>Wickets taken: ${player.stats.wickets}</p>
+    `;
+}
+
+// ===== ANNOUNCEMENTS =====
+function renderAnnouncements() {
+    const container = document.getElementById("announcements-list");
+    if (!container) return;
+    const items = getData("announcements");
+    container.innerHTML = items.length ? items.map(a => `
+        <div class="card"><p>${a.text}</p><small>${a.date}</small></div>
+    `).join("") : "<p>No announcements yet.</p>";
+}
+
+function postAnnouncement() {
+    const text = document.getElementById("new-announcement").value.trim();
+    if (!text) { alert("Write something first"); return; }
+    const items = getData("announcements");
+    items.unshift({ id: "a" + Date.now(), text, date: new Date().toISOString().split("T")[0] });
+    saveData("announcements", items);
+    renderAnnouncements();
+    document.getElementById("new-announcement").value = "";
+}
+
+// Always seed data when script loads
+initData();
+
+// ===== EXTEND SEED DATA: add profile fields to players =====
+function ensureProfileFields() {
+    const players = getData("players");
+    let changed = false;
+    players.forEach(p => {
+        if (!p.profile) {
+            p.profile = {
+                bio: "",
+                privacy: "team",
+                medical: "",
+                phone: "",
+                email: "",
+                dob: "",
+                photo: ""
+            };
+            changed = true;
+        }
+        if (!p.settings) {
+            p.settings = { language: "English", notifications: true };
+            changed = true;
         }
     });
+    if (changed) saveData("players", players);
 }
 
-// ===== INIT =====
-initData();
-ensureCoachAccount();
-ensureMoreAnnouncements();
+// ===== Placeholder messages (UI only) =====
+const placeholderMessages = [
+    { from: "Coach", text: "Great effort at training today!", time: "9:15 AM" },
+    { from: "Team Group", text: "Reminder: match this Sunday, 9am.", time: "Yesterday" }
+];
 
-// only attach login handler on pages that have the button
-const loginBtn = document.getElementById("login-btn");
-if (loginBtn) {
-    loginBtn.addEventListener("click", login);
+// ===== TAB SWITCHING (used by all dashboards) =====
+function switchTab(tabId) {
+    document.querySelectorAll(".tab-panel").forEach(el => el.style.display = "none");
+    document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+
+    const panel = document.getElementById(tabId);
+    if (panel) panel.style.display = "block";
+
+    const btn = document.querySelector(`[data-tab="${tabId}"]`);
+    if (btn) btn.classList.add("active");
 }
-;
-ensureMoreAnnouncements();
 
-// ===== INIT =====
-initData();
-ensureCoachAccount();
-ensureMoreAnnouncements();
+// ===== PROFILE RENDER (player) =====
+function renderPlayerProfile() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    if (!player) return;
 
-// only attach login handler on pages that have the button
-const loginBtn = document.getElementById("login-btn");
-if (loginBtn) {
-    loginBtn.addEventListener("click", login);
+    document.getElementById("profile-name").textContent = player.name;
+    document.getElementById("profile-team").textContent = "Team: Senior Cricket Squad";
+    document.getElementById("profile-stats").innerHTML = `
+        <p>Matches: ${player.stats.matches} | Runs: ${player.stats.runs} | Wickets: ${player.stats.wickets}</p>
+    `;
+    document.getElementById("profile-bio").textContent = player.profile.bio || "No bio added yet.";
+
+    // Pre-fill edit form
+    document.getElementById("edit-name").value = player.name;
+    document.getElementById("edit-bio").value = player.profile.bio;
+    document.getElementById("edit-medical").value = player.profile.medical;
+    document.getElementById("edit-phone").value = player.profile.phone;
+    document.getElementById("edit-email").value = player.profile.email;
+    document.getElementById("edit-dob").value = player.profile.dob;
+    document.getElementById("edit-privacy").value = player.profile.privacy;
 }
+
+function saveProfile() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const players = getData("players");
+    const player = players.find(p => p.id === linkedId);
+    if (!player) return;
+
+    player.name = document.getElementById("edit-name").value.trim() || player.name;
+    player.profile.bio = document.getElementById("edit-bio").value.trim();
+    player.profile.medical = document.getElementById("edit-medical").value.trim();
+    player.profile.phone = document.getElementById("edit-phone").value.trim();
+    player.profile.email = document.getElementById("edit-email").value.trim();
+    player.profile.dob = document.getElementById("edit-dob").value;
+    player.profile.privacy = document.getElementById("edit-privacy").value;
+
+    saveData("players", players);
+    alert("Profile updated!");
+    renderPlayerProfile();
+    switchTab("tab-profile");
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const player = getData("players").find(p => p.id === linkedId);
+    if (!player) return;
+    document.getElementById("setting-language").value = player.settings.language;
+    document.getElementById("setting-notifications").checked = player.settings.notifications;
+}
+
+function saveSettings() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const players = getData("players");
+    const player = players.find(p => p.id === linkedId);
+    if (!player) return;
+    player.settings.language = document.getElementById("setting-language").value;
+    player.settings.notifications = document.getElementById("setting-notifications").checked;
+    saveData("players", players);
+    alert("Settings saved!");
+}
+
+// ===== MESSAGES (placeholder UI) =====
+function renderMessages() {
+    const container = document.getElementById("messages-list");
+    if (!container) return;
+    container.innerHTML = placeholderMessages.map(m => `
+        <div class="card">
+            <strong>${m.from}</strong>
+            <p>${m.text}</p>
+            <small>${m.time}</small>
+        </div>
+    `).join("");
+}
+
+// Run field setup on load
+ensureProfileFields();
+
+// ===== PHOTOS =====
+function ensurePhotosSeed() {
+    if (localStorage.getItem("photosInitialized")) return;
+    const photos = [
+        { id: "ph1", url: "https://picsum.photos/seed/cricket1/400/280", caption: "Training session", date: "2026-07-05" },
+        { id: "ph2", url: "https://picsum.photos/seed/cricket2/400/280", caption: "Match day warm-up", date: "2026-07-12" },
+        { id: "ph3", url: "https://picsum.photos/seed/cricket3/400/280", caption: "Team huddle", date: "2026-07-14" }
+    ];
+    saveData("photos", photos);
+    localStorage.setItem("photosInitialized", "true");
+}
+
+function renderPhotos() {
+    const container = document.getElementById("photos-grid");
+    if (!container) return;
+    const photos = getData("photos");
+    container.innerHTML = photos.length ? photos.map(p => `
+        <div class="photo-card">
+            <img src="${p.url}" alt="${p.caption}">
+            <p>${p.caption}</p>
+            <small>${p.date}</small>
+        </div>
+    `).join("") : "<p>No photos uploaded yet.</p>";
+}
+
+function uploadPhoto() {
+    const fileInput = document.getElementById("photo-file");
+    const captionInput = document.getElementById("photo-caption");
+    const file = fileInput.files[0];
+
+    if (!file) { alert("Choose a photo first"); return; }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const photos = getData("photos");
+        photos.unshift({
+            id: "ph" + Date.now(),
+            url: e.target.result,
+            caption: captionInput.value.trim() || "Team photo",
+            date: new Date().toISOString().split("T")[0]
+        });
+        saveData("photos", photos);
+        renderPhotos();
+        fileInput.value = "";
+        captionInput.value = "";
+    };
+    reader.readAsDataURL(file);
+}
+
+// ===== MORE MESSAGES =====
+placeholderMessages.push(
+    { from: "Coach", text: "Well played everyone in Sunday's match!", time: "2 days ago" },
+    { from: "Team Group", text: "New training kit has arrived, collect from the clubhouse.", time: "3 days ago" },
+    { from: "Coach", text: "Fees are due by end of the month, please check your dashboard.", time: "5 days ago" },
+    { from: "Team Group", text: "Photos from last week's match are now up!", time: "1 week ago" }
+);
+
+ensurePhotosSeed();
+
+renderPhotos();
+
+// ===== EXPAND ROSTER (adds more players if fewer than 15 exist) =====
+function ensureMorePlayers() {
+    let players = getData("players");
+    if (players.length >= 15) return;
+
+    const extraNames = [
+        "Jordan Blake", "Mia Chen", "Ethan Wright", "Priya Nair", "Liam Foster",
+        "Zoe Martinez", "Noah Bennett", "Ava Thompson", "Ryan Okafor", "Chloe Baker",
+        "Kai Nakamura", "Emily Scott", "Marcus Reid"
+    ];
+
+    let counter = players.length + 1;
+    extraNames.forEach(name => {
+        if (players.length >= 15) return;
+        const id = "p" + counter;
+        players.push({
+            id,
+            username: "player" + counter,
+            password: "player123",
+            name,
+            fees: { amount: 150, paid: Math.random() > 0.5 },
+            stats: {
+                matches: Math.floor(Math.random() * 10) + 1,
+                runs: Math.floor(Math.random() * 300),
+                wickets: Math.floor(Math.random() * 15)
+            },
+            profile: { bio: "", privacy: "team", medical: "", phone: "", email: "", dob: "", photo: "" },
+            settings: { language: "English", notifications: true }
+        });
+        counter++;
+    });
+
+    saveData("players", players);
+}
+
+// ===== REAL CHAT (coach <-> each player) =====
+function getChats() {
+    return JSON.parse(localStorage.getItem("chats")) || {};
+}
+
+function saveChats(chats) {
+    localStorage.setItem("chats", JSON.stringify(chats));
+}
+
+function getChatFor(playerId) {
+    const chats = getChats();
+    return chats[playerId] || [];
+}
+
+function nowTime() {
+    const d = new Date();
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// ----- Coach side -----
+let activeChatPlayerId = null;
+
+function renderCoachChatList() {
+    const container = document.getElementById("chat-player-list");
+    if (!container) return;
+    const players = getData("players");
+    container.innerHTML = players.map(p => `
+        <div class="chat-contact ${p.id === activeChatPlayerId ? 'active' : ''}" onclick="openCoachChat('${p.id}')">
+            <strong>${p.name}</strong>
+        </div>
+    `).join("");
+}
+
+function openCoachChat(playerId) {
+    activeChatPlayerId = playerId;
+    renderCoachChatList();
+    renderCoachChatWindow();
+}
+
+function renderCoachChatWindow() {
+    const windowEl = document.getElementById("chat-window");
+    const titleEl = document.getElementById("chat-window-title");
+    if (!windowEl) return;
+
+    if (!activeChatPlayerId) {
+        windowEl.innerHTML = "<p style='padding:20px; color:#9ca3af;'>Select a player to start chatting.</p>";
+        if (titleEl) titleEl.textContent = "";
+        return;
+    }
+
+    const players = getData("players");
+    const player = players.find(p => p.id === activeChatPlayerId);
+    if (titleEl) titleEl.textContent = "Chat with " + (player ? player.name : "");
+
+    const messages = getChatFor(activeChatPlayerId);
+    windowEl.innerHTML = messages.length ? messages.map(m => `
+        <div class="chat-bubble ${m.from === 'coach' ? 'from-me' : 'from-them'}">
+            <p>${m.text}</p>
+            <small>${m.time}</small>
+        </div>
+    `).join("") : "<p style='padding:20px; color:#9ca3af;'>No messages yet. Say hello!</p>";
+
+    windowEl.scrollTop = windowEl.scrollHeight;
+}
+
+function sendCoachMessage() {
+    if (!activeChatPlayerId) { alert("Select a player first"); return; }
+    const input = document.getElementById("chat-input");
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chats = getChats();
+    if (!chats[activeChatPlayerId]) chats[activeChatPlayerId] = [];
+    chats[activeChatPlayerId].push({ from: "coach", text, time: nowTime() });
+    saveChats(chats);
+
+    input.value = "";
+    renderCoachChatWindow();
+}
+
+// ----- Player side -----
+function renderPlayerChat() {
+    const windowEl = document.getElementById("chat-window");
+    if (!windowEl) return;
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const messages = getChatFor(linkedId);
+
+    windowEl.innerHTML = messages.length ? messages.map(m => `
+        <div class="chat-bubble ${m.from === 'player' ? 'from-me' : 'from-them'}">
+            <p>${m.text}</p>
+            <small>${m.time}</small>
+        </div>
+    `).join("") : "<p style='padding:20px; color:#9ca3af;'>No messages yet. Message your coach!</p>";
+
+    windowEl.scrollTop = windowEl.scrollHeight;
+}
+
+function sendPlayerMessage() {
+    const linkedId = localStorage.getItem("linkedPlayerId");
+    const input = document.getElementById("chat-input");
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chats = getChats();
+    if (!chats[linkedId]) chats[linkedId] = [];
+    chats[linkedId].push({ from: "player", text, time: nowTime() });
+    saveChats(chats);
+
+    input.value = "";
+    renderPlayerChat();
+}
+
+// Run expansions on load
+ensureMorePlayers();

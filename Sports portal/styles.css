@@ -608,26 +608,3 @@ button:active {
     border-left: 3px solid #f4c430;
 }
 
-.grade-badge {
-    display: inline-block;
-    background: #eef2ff;
-    color: #3b82f6;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    margin-left: 6px;
-}
-
-.filter-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-}
-
-.filter-bar input, .filter-bar select {
-    margin: 0;
-    flex: 1;
-    min-width: 140px;
-}
