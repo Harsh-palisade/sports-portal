@@ -38,7 +38,6 @@ function initData() {
 function getData(key) { return JSON.parse(localStorage.getItem(key)) || []; }
 function saveData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
-// ===== LOGIN / SESSION =====
 function login() {
     const role = document.getElementById("role").value;
     const username = document.getElementById("username").value.trim();
@@ -49,28 +48,48 @@ function login() {
         return;
     }
 
-    let success = false;
-    let linkedPlayerId = null;
-
-    if (role === "coach") {
-        const coach = JSON.parse(localStorage.getItem("coach"));
-        success = (username === coach.username && password === coach.password);
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        alert("Password must be at least " + MIN_PASSWORD_LENGTH + " characters.");
+        return;
     }
 
-    if (role === "parent") {
-        const parent = getData("parents").find(p => p.username === username && p.password === password);
-        if (parent) { success = true; linkedPlayerId = parent.childId; }
-    }
+    const account = findAccount(role, username);
 
-    if (role === "player") {
-        const player = getData("players").find(p => p.username === username && p.password === password);
-        if (player) { success = true; linkedPlayerId = player.id; }
-    }
-
-    if (!success) {
+    if (!account) {
+        logAttempt(username, role, false, "Account not found");
         alert("Incorrect username or password for " + role);
         return;
     }
+
+    if (account.active === false) {
+        logAttempt(username, role, false, "Account disabled");
+        alert("This account has been disabled. Contact your coach.");
+        return;
+    }
+
+    if (account.locked) {
+        logAttempt(username, role, false, "Account locked");
+        alert("This account is locked due to too many failed attempts. Contact your coach.");
+        return;
+    }
+
+    if (account.password !== password) {
+        account.failedAttempts = (account.failedAttempts || 0) + 1;
+        if (account.failedAttempts >= MAX_LOGIN_ATTEMPTS) account.locked = true;
+        persistAccountByRole(role, account);
+        logAttempt(username, role, false, account.locked ? "Account locked (too many attempts)" : "Incorrect password");
+        alert(account.locked ? "Account locked due to too many failed attempts." : "Incorrect username or password for " + role);
+        return;
+    }
+
+    account.failedAttempts = 0;
+    persistAccountByRole(role, account);
+
+    let linkedPlayerId = null;
+    if (role === "parent") linkedPlayerId = account.childId;
+    if (role === "player") linkedPlayerId = account.id;
+
+    logAttempt(username, role, true);
 
     localStorage.setItem("loggedInRole", role);
     localStorage.setItem("loggedInUser", username);
@@ -78,21 +97,6 @@ function login() {
     else localStorage.removeItem("linkedPlayerId");
 
     window.location.href = "dashboard." + role + ".html";
-}
-
-function requireLogin(expectedRole) {
-    const role = localStorage.getItem("loggedInRole");
-    if (!role || role !== expectedRole) {
-        alert("Please log in to view this page.");
-        window.location.href = "login.html";
-    }
-}
-
-function logout() {
-    localStorage.removeItem("loggedInRole");
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("linkedPlayerId");
-    window.location.href = "login.html";
 }
 
 // ===== NAVBAR =====
@@ -188,21 +192,31 @@ function renderRoster() {
 
 function addPlayer() {
     const name = document.getElementById("new-player-name").value.trim();
+    const passwordInput = document.getElementById("new-player-password");
+    const gradeInput = document.getElementById("new-player-grade");
+    const password = passwordInput ? passwordInput.value.trim() : "";
+    const grade = gradeInput ? gradeInput.value : "1";
+
     if (!name) { alert("Enter a player name"); return; }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        alert("Password must be at least " + MIN_PASSWORD_LENGTH + " characters.");
+        return;
+    }
+
     const players = getData("players");
     const id = "p" + Date.now();
-    players.push({ id, username: "player" + Date.now(), password: "changeme",
-        name, fees: { amount: 150, paid: false }, stats: { matches: 0, runs: 0, wickets: 0 } });
+    players.push({
+        id, username: "player" + Date.now(), password, name, grade,
+        active: true, locked: false, failedAttempts: 0,
+        fees: { amount: 150, paid: false },
+        stats: { matches: 0, runs: 0, wickets: 0 },
+        profile: { bio: "", privacy: "team", medical: "", phone: "", email: "", dob: "", photo: "" },
+        settings: { language: "English", notifications: true }
+    });
     saveData("players", players);
-    renderRoster();
+    renderRosterFiltered();
     document.getElementById("new-player-name").value = "";
-}
-
-function removePlayer(playerId) {
-    let players = getData("players");
-    players = players.filter(p => p.id !== playerId);
-    saveData("players", players);
-    renderRoster();
+    if (passwordInput) passwordInput.value = "";
 }
 
 // ===== STATS (own player, for player dashboard) =====
@@ -668,3 +682,263 @@ function renderMyStatsGrid() {
 
 // Run on load
 ensureMoreAnnouncements();
+
+// ===== SECURITY SETTINGS =====
+const MIN_PASSWORD_LENGTH = 6;
+const MAX_LOGIN_ATTEMPTS = 5;
+
+// ===== ACCOUNT FIELDS (active/locked/failedAttempts) =====
+function ensureAccountFields() {
+    let players = getData("players");
+    let changed = false;
+    players.forEach(p => {
+        if (p.active === undefined) { p.active = true; changed = true; }
+        if (p.locked === undefined) { p.locked = false; changed = true; }
+        if (p.failedAttempts === undefined) { p.failedAttempts = 0; changed = true; }
+    });
+    if (changed) saveData("players", players);
+
+    let parents = getData("parents");
+    changed = false;
+    parents.forEach(pa => {
+        if (pa.active === undefined) { pa.active = true; changed = true; }
+        if (pa.locked === undefined) { pa.locked = false; changed = true; }
+        if (pa.failedAttempts === undefined) { pa.failedAttempts = 0; changed = true; }
+    });
+    if (changed) saveData("parents", parents);
+
+    let coach = JSON.parse(localStorage.getItem("coach"));
+    if (coach && coach.active === undefined) {
+        coach.active = true;
+        coach.locked = false;
+        coach.failedAttempts = 0;
+        localStorage.setItem("coach", JSON.stringify(coach));
+    }
+}
+
+// ===== AUDIT LOG =====
+function getAuditLog() {
+    return JSON.parse(localStorage.getItem("auditLog")) || [];
+}
+
+function logAttempt(username, role, success, reason) {
+    const log = getAuditLog();
+    log.unshift({
+        username, role, success,
+        reason: reason || (success ? "Success" : "Failed"),
+        time: new Date().toLocaleString()
+    });
+    if (log.length > 100) log.length = 100;
+    localStorage.setItem("auditLog", JSON.stringify(log));
+}
+
+function renderAuditLog() {
+    const container = document.getElementById("audit-log-list");
+    if (!container) return;
+    const log = getAuditLog();
+    container.innerHTML = log.length ? log.slice(0, 30).map(entry => `
+        <div class="audit-row ${entry.success ? 'audit-success' : 'audit-fail'}">
+            <strong>${entry.username}</strong> (${entry.role}) — ${entry.success ? 'Successful login' : 'Failed: ' + entry.reason}
+            <small>${entry.time}</small>
+        </div>
+    `).join("") : "<p>No login activity yet.</p>";
+}
+
+// ===== ACCOUNT ADMIN (coach only) =====
+function toggleAccountActive(role, username) {
+    const key = role === "player" ? "players" : "parents";
+    const list = getData(key);
+    const acc = list.find(x => x.username === username);
+    acc.active = !acc.active;
+    saveData(key, list);
+    renderAdminAccounts();
+}
+
+function unlockAccount(role, username) {
+    const key = role === "player" ? "players" : "parents";
+    const list = getData(key);
+    const acc = list.find(x => x.username === username);
+    acc.locked = false;
+    acc.failedAttempts = 0;
+    saveData(key, list);
+    renderAdminAccounts();
+}
+
+function accountStatusLabel(acc) {
+    if (acc.locked) return "Locked";
+    if (acc.active === false) return "Disabled";
+    return "Active";
+}
+
+function accountStatusClass(acc) {
+    if (acc.locked) return "status-locked";
+    if (acc.active === false) return "status-disabled";
+    return "status-active";
+}
+
+function renderAdminAccounts() {
+    const playerContainer = document.getElementById("admin-player-accounts");
+    if (playerContainer) {
+        const players = getData("players");
+        playerContainer.innerHTML = players.map(p => `
+            <div class="admin-row">
+                <span>${p.name} (${p.username})</span>
+                <span class="admin-status ${accountStatusClass(p)}">${accountStatusLabel(p)}</span>
+                <button onclick="toggleAccountActive('player','${p.username}')">${p.active === false ? 'Enable' : 'Disable'}</button>
+                ${p.locked ? `<button onclick="unlockAccount('player','${p.username}')">Unlock</button>` : ''}
+            </div>
+        `).join("");
+    }
+
+    const parentContainer = document.getElementById("admin-parent-accounts");
+    if (parentContainer) {
+        const parents = getData("parents");
+        parentContainer.innerHTML = parents.map(p => `
+            <div class="admin-row">
+                <span>${p.username}</span>
+                <span class="admin-status ${accountStatusClass(p)}">${accountStatusLabel(p)}</span>
+                <button onclick="toggleAccountActive('parent','${p.username}')">${p.active === false ? 'Enable' : 'Disable'}</button>
+                ${p.locked ? `<button onclick="unlockAccount('parent','${p.username}')">Unlock</button>` : ''}
+            </div>
+        `).join("");
+    }
+}
+
+// Run on load
+ensureAccountFields();
+
+// ===== STAFF (multiple coaches/staff, replaces single hardcoded coach) =====
+function ensureStaffMigration() {
+    let staff = getData("staff");
+    if (staff.length > 0) return;
+
+    const oldCoach = JSON.parse(localStorage.getItem("coach"));
+    staff.push({
+        username: oldCoach ? oldCoach.username : "coach1",
+        password: oldCoach ? oldCoach.password : "coach123",
+        name: "Head Coach",
+        position: "Head Coach",
+        active: true,
+        locked: false,
+        failedAttempts: 0
+    });
+    saveData("staff", staff);
+}
+
+function findAccount(role, username) {
+    if (role === "coach") return getData("staff").find(a => a.username === username);
+    if (role === "parent") return getData("parents").find(a => a.username === username);
+    if (role === "player") return getData("players").find(a => a.username === username);
+    return null;
+}
+
+function persistAccountByRole(role, updated) {
+    const key = role === "coach" ? "staff" : (role === "parent" ? "parents" : "players");
+    const list = getData(key);
+    const idx = list.findIndex(a => a.username === updated.username);
+    if (idx > -1) { list[idx] = updated; saveData(key, list); }
+}
+
+function addStaffMember() {
+    const name = document.getElementById("new-staff-name").value.trim();
+    const username = document.getElementById("new-staff-username").value.trim();
+    const password = document.getElementById("new-staff-password").value.trim();
+    const position = document.getElementById("new-staff-position").value;
+
+    if (!name || !username) { alert("Enter a name and username"); return; }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        alert("Password must be at least " + MIN_PASSWORD_LENGTH + " characters.");
+        return;
+    }
+    const staff = getData("staff");
+    if (staff.find(s => s.username === username)) { alert("That username is already taken"); return; }
+
+    staff.push({ username, password, name, position, active: true, locked: false, failedAttempts: 0 });
+    saveData("staff", staff);
+    renderStaffAdmin();
+
+    document.getElementById("new-staff-name").value = "";
+    document.getElementById("new-staff-username").value = "";
+    document.getElementById("new-staff-password").value = "";
+}
+
+function removeStaffMember(username) {
+    let staff = getData("staff");
+    if (staff.length <= 1) { alert("Can't remove the last remaining staff account."); return; }
+    staff = staff.filter(s => s.username !== username);
+    saveData("staff", staff);
+    renderStaffAdmin();
+}
+
+function toggleStaffActive(username) {
+    const staff = getData("staff");
+    const s = staff.find(x => x.username === username);
+    s.active = !s.active;
+    saveData("staff", staff);
+    renderStaffAdmin();
+}
+
+function unlockStaffAccount(username) {
+    const staff = getData("staff");
+    const s = staff.find(x => x.username === username);
+    s.locked = false;
+    s.failedAttempts = 0;
+    saveData("staff", staff);
+    renderStaffAdmin();
+}
+
+function renderStaffAdmin() {
+    const container = document.getElementById("admin-staff-accounts");
+    if (!container) return;
+    const staff = getData("staff");
+    container.innerHTML = staff.map(s => `
+        <div class="admin-row">
+            <span>${s.name} — ${s.position} (${s.username})</span>
+            <span class="admin-status ${accountStatusClass(s)}">${accountStatusLabel(s)}</span>
+            <button onclick="toggleStaffActive('${s.username}')">${s.active === false ? 'Enable' : 'Disable'}</button>
+            ${s.locked ? `<button onclick="unlockStaffAccount('${s.username}')">Unlock</button>` : ''}
+            <button onclick="removeStaffMember('${s.username}')">Remove</button>
+        </div>
+    `).join("");
+}
+
+// ===== GRADE LEVELS (1-6) + SEARCH/FILTER =====
+function ensureGradeField() {
+    const players = getData("players");
+    let changed = false;
+    players.forEach(p => {
+        if (!p.grade) { p.grade = String(Math.floor(Math.random() * 6) + 1); changed = true; }
+    });
+    if (changed) saveData("players", players);
+}
+
+function renderRosterFiltered() {
+    const container = document.getElementById("roster-list");
+    if (!container) return;
+
+    const searchInput = document.getElementById("member-search");
+    const gradeInput = document.getElementById("member-grade-filter");
+    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    const gradeFilter = gradeInput ? gradeInput.value : "all";
+
+    let players = getData("players");
+    if (searchTerm) players = players.filter(p => p.name.toLowerCase().includes(searchTerm));
+    if (gradeFilter !== "all") players = players.filter(p => String(p.grade) === gradeFilter);
+
+    container.innerHTML = players.length ? players.map(p => `
+        <div class="card">
+            <h3>${p.name} <span class="grade-badge">Grade ${p.grade}</span> <span class="admin-status ${accountStatusClass(p)}">${accountStatusLabel(p)}</span></h3>
+            <p>Matches: ${p.stats.matches} | Runs: ${p.stats.runs} | Wickets: ${p.stats.wickets}</p>
+            <button onclick="removePlayer('${p.id}')">Remove Player</button>
+        </div>
+    `).join("") : "<p>No players match your search.</p>";
+}
+
+// renderRoster now just calls the filtered version, so existing calls elsewhere still work
+function renderRoster() {
+    renderRosterFiltered();
+}
+
+// Run on load
+ensureStaffMigration();
+ensureGradeField();

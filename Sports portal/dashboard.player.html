@@ -149,9 +149,17 @@
         </div>
     </div>
 
-    <div id="tab-help" class="tab-panel" style="display:none;">
-        <h1>Help &amp; Support</h1>
-        <div class="card">
+  <div id="tab-messages" class="tab-panel" style="display:none;">
+    <h1>Chat with Coach</h1>
+    <div class="chat-main" style="height:500px;">
+        <div class="chat-header">Coach</div>
+        <div class="chat-window" id="chat-window"></div>
+        <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Type a message...">
+            <button onclick="sendPlayerMessage()">Send</button>
+        </div>
+    </div>
+</div>
             <h3>About App</h3>
             <p>Sports Portal — Cricket Management System. Built as a Year 12 Software Engineering major project.</p>
         </div>
@@ -175,7 +183,7 @@
 
 <script src="script.js"></script>
 <script>
-    requireLogin("player");
+requireLogin("player");
     renderNavbar();
     renderOwnStats();
     renderFeeForLinkedPlayer();
@@ -185,6 +193,8 @@
     renderPlayerProfile();
     renderSettings();
     renderPhotos();
+    renderMyStatsGrid();
+    renderRecentAnnouncementsHome(5);
 
     (function renderRosterView() {
         const container = document.getElementById("roster-view");

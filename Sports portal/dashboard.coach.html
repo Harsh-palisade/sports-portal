@@ -173,8 +173,40 @@
     renderFeesCoach();
     renderAnnouncements();
     renderMessages();
+    renderStaffAdmin();
 
     const label2 = document.getElementById("username-label-2");
     if (label2) label2.textContent = "Username: " + localStorage.getItem("loggedInUser");
 </script>
 
+<div id="tab-admin" class="tab-panel" style="display:none;">
+    <h1>Admin</h1>
+    <div class="card">
+        <h3>Staff / Coaches</h3>
+        <div id="admin-staff-accounts"></div>
+        <hr>
+        <h3>Add Staff Member</h3>
+        <input type="text" id="new-staff-name" placeholder="Full name">
+        <input type="text" id="new-staff-username" placeholder="Username">
+        <input type="text" id="new-staff-password" placeholder="Password (min 6 chars)">
+        <select id="new-staff-position">
+            <option>Head Coach</option>
+            <option>Assistant Coach</option>
+            <option>Team Manager</option>
+            <option>Physio/Trainer</option>
+        </select>
+        <button onclick="addStaffMember()">Add Staff</button>
+    </div>
+    <div class="card">
+        <h3>Player Accounts</h3>
+        <div id="admin-player-accounts"></div>
+    </div>
+    <div class="card">
+        <h3>Parent Accounts</h3>
+        <div id="admin-parent-accounts"></div>
+    </div>
+    <div class="card">
+        <h3>Login Audit Log</h3>
+        <div id="audit-log-list"></div>
+    </div>
+</div>
