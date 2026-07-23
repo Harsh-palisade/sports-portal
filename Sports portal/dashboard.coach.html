@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<!-- ===== Top Bar ===== -->
+<!-- ===== NAVBAR ===== -->
 <div class="navbar">
     <h1>🏏 Sports Portal</h1>
     <div class="nav-right">
@@ -16,50 +16,94 @@
     </div>
 </div>
 
-<!-- ===== Top Tabs ===== -->
-<div class="top-tabs">
-    <button class="nav-btn" data-tab="tab-members" onclick="switchTab('tab-members')">Members</button>
-    <button class="nav-btn" data-tab="tab-photos" onclick="switchTab('tab-photos')">Photos</button>
-    <button class="nav-btn" data-tab="tab-teaminfo" onclick="switchTab('tab-teaminfo')">Team Info</button>
-    <button class="nav-btn" data-tab="tab-fees" onclick="switchTab('tab-fees')">Fees</button>
+<!-- ===== UNIFIED SIDE MENU ===== -->
+<div class="side-menu">
+    <h2>Menu</h2>
+
+    <div class="menu-item" data-role="all" onclick="switchTab('tab-home')">🏠 Home</div>
+    <div class="menu-item" data-role="coach,admin" onclick="switchTab('tab-members')">👥 Members</div>
+    <div class="menu-item" data-role="coach,admin" onclick="switchTab('tab-attendance')">📝 Attendance</div>
+    <div class="menu-item" data-role="coach,player,parent" onclick="switchTab('tab-stats')">📊 Stats</div>
+    <div class="menu-item" data-role="coach,admin,parent,player" onclick="switchTab('tab-fees')">💰 Fees</div>
+    <div class="menu-item" data-role="coach,admin,parent,player" onclick="switchTab('tab-schedule')">📅 Matches</div>
+    <div class="menu-item" data-role="coach,admin,parent,player" onclick="switchTab('tab-photos')">🖼 Photos</div>
+    <div class="menu-item" data-role="coach,player" onclick="switchTab('tab-messages')">💬 Messages</div>
+    <div class="menu-item" data-role="coach,player,parent" onclick="switchTab('tab-polls')">📌 Polls</div>
+    <div class="menu-item" data-role="parent" onclick="switchTab('tab-interviews')">📞 Interviews</div>
+    <div class="menu-item" data-role="all" onclick="switchTab('tab-profile')">👤 Profile</div>
+    <div class="menu-item" data-role="admin" onclick="switchTab('tab-admin')">⚙️ Admin Panel</div>
 </div>
 
+<!-- ===== MAIN DASHBOARD CONTENT ===== -->
 <div class="dashboard">
 
-   <div id="tab-home" class="tab-panel">
-    <div class="home-hero">
-        <h1 id="hero-greeting">Welcome back, Coach</h1>
-        <p>Here's what's happening with your team today.</p>
-    </div>
+    <!-- ===== HOME ===== -->
+    <div id="tab-home" class="tab-panel">
+        <div class="home-hero">
+            <h1 id="hero-greeting">Welcome back, Coach</h1>
+            <p>Here's what's happening with your team today.</p>
+        </div>
 
-    <div class="stats-grid" id="team-overview-stats"></div>
+        <div class="stats-grid" id="team-overview-stats"></div>
 
-    <div class="quick-actions">
-        <div class="quick-action-btn" onclick="switchTab('tab-schedule')">
-            <span class="quick-action-icon">📅</span>
-            Add Match
-        </div>
-        <div class="quick-action-btn" onclick="switchTab('tab-members')">
-            <span class="quick-action-icon">➕</span>
-            Add Player
-        </div>
-        <div class="quick-action-btn" onclick="switchTab('tab-fees')">
-            <span class="quick-action-icon">💰</span>
-            Manage Fees
-        </div>
-        <div class="quick-action-btn" onclick="switchTab('tab-messages')">
-            <span class="quick-action-icon">💬</span>
-            Chat
+        <div class="card announcement-feed">
+            <h3>Latest Announcements</h3>
+            <div id="home-announcements"></div>
         </div>
     </div>
 
-    <div class="card announcement-feed">
-        <h3>Latest Announcements</h3>
-        <div id="home-announcements"></div>
-    </div>
-</div>
+    <!-- ===== MEMBERS ===== -->
+    <div id="tab-members" class="tab-panel" style="display:none;">
+        <h1>Members</h1>
+        <div class="card">
+            <input type="text" id="member-search" placeholder="Search by name..." oninput="renderRosterFiltered()">
+            <select id="member-grade-filter" onchange="renderRosterFiltered()">
+                <option value="all">All Grades</option>
+                <option value="1">Grade 1</option>
+                <option value="2">Grade 2</option>
+                <option value="3">Grade 3</option>
+                <option value="4">Grade 4</option>
+                <option value="5">Grade 5</option>
+                <option value="6">Grade 6</option>
+            </select>
 
-    <!-- ===== SCHEDULE ===== -->
+            <div id="roster-list"></div>
+
+            <hr>
+            <h3>Add New Player</h3>
+            <input type="text" id="new-player-name" placeholder="Player name">
+            <input type="text" id="new-player-password" placeholder="Password (min 6 chars)">
+            <select id="new-player-grade">
+                <option value="1">Grade 1</option>
+                <option value="2">Grade 2</option>
+                <option value="3">Grade 3</option>
+                <option value="4">Grade 4</option>
+                <option value="5">Grade 5</option>
+                <option value="6">Grade 6</option>
+            </select>
+            <button onclick="addPlayer()">Add Player</button>
+        </div>
+    </div>
+
+    <!-- ===== ATTENDANCE ===== -->
+    <div id="tab-attendance" class="tab-panel" style="display:none;">
+        <h1>Attendance</h1>
+        <div id="attendance-list"></div>
+    </div>
+
+    <!-- ===== STATS ===== -->
+    <div id="tab-stats" class="tab-panel" style="display:none;">
+        <h1>Player Stats</h1>
+        <div id="stats-list"></div>
+    </div>
+
+    <!-- ===== FEES ===== -->
+    <div id="tab-fees" class="tab-panel" style="display:none;">
+        <h1>Fees Management</h1>
+        <div id="fees-list"></div>
+    </div>
+
+    <!-- ===== MATCHES ===== -->
     <div id="tab-schedule" class="tab-panel" style="display:none;">
         <h1>Schedule</h1>
         <div class="card">
@@ -74,139 +118,88 @@
         </div>
     </div>
 
+    <!-- ===== PHOTOS ===== -->
+    <div id="tab-photos" class="tab-panel" style="display:none;">
+        <h1>Photos</h1>
+        <div class="card">
+            <h3>Upload New Photo</h3>
+            <input type="file" id="photo-file" accept="image/*">
+            <input type="text" id="photo-caption" placeholder="Caption (optional)">
+            <button onclick="uploadPhoto()">Upload</button>
+        </div>
+        <div id="photos-grid" class="photos-grid"></div>
+    </div>
+
     <!-- ===== MESSAGES ===== -->
     <div id="tab-messages" class="tab-panel" style="display:none;">
         <h1>Messages</h1>
         <div id="messages-list"></div>
     </div>
 
-    <!-- ===== MEMBERS (coach can add/remove) ===== -->
-    <div id="tab-members" class="tab-panel" style="display:none;">
-        <h1>Members</h1>
-        <div class="card">
-            <div id="roster-list"></div>
-            <hr>
-            <h3>Add New Player</h3>
-            <input type="text" id="new-player-name" placeholder="Player name">
-            <button onclick="addPlayer()">Add Player</button>
-        </div>
+    <!-- ===== POLLS ===== -->
+    <div id="tab-polls" class="tab-panel" style="display:none;">
+        <h1>Polls</h1>
+        <div id="polls-list"></div>
+        <hr>
+        <h3>Create Poll</h3>
+        <input type="text" id="poll-question" placeholder="Poll question">
+        <input type="text" id="poll-options" placeholder="Comma-separated options">
+        <button onclick="createPollUI()">Create Poll</button>
     </div>
 
-   <!-- ===== PHOTOS ===== -->
-<div id="tab-photos" class="tab-panel" style="display:none;">
-    <h1>Photos</h1>
-    <div class="card">
-        <h3>Upload New Photo</h3>
-        <input type="file" id="photo-file" accept="image/*">
-        <input type="text" id="photo-caption" placeholder="Caption (optional)">
-        <button onclick="uploadPhoto()">Upload</button>
-    </div>
-    <div id="photos-grid" class="photos-grid"></div>
-</div>
-
-    <!-- ===== TEAM INFO ===== -->
-    <div id="tab-teaminfo" class="tab-panel" style="display:none;">
-        <h1>Team Info</h1>
-        <div class="card">
-            <h3>Senior Cricket Squad</h3>
-            <p>Home Ground: Central Oval</p>
-            <p>Training: Tuesdays & Thursdays, 5:30 PM</p>
-        </div>
+    <!-- ===== INTERVIEWS ===== -->
+    <div id="tab-interviews" class="tab-panel" style="display:none;">
+        <h1>Parent Interviews</h1>
+        <div id="interviews-list"></div>
     </div>
 
-    <!-- ===== FEES (coach can toggle) ===== -->
-    <div id="tab-fees" class="tab-panel" style="display:none;">
-        <h1>Fees Management</h1>
-        <div id="fees-list"></div>
-    </div>
-
-    <!-- ===== ANNOUNCEMENTS (posting lives on Home + here for convenience) ===== -->
-    <div id="tab-announcements" class="tab-panel" style="display:none;">
-        <h1>Post Announcement</h1>
-        <div class="card">
-            <input type="text" id="new-announcement" placeholder="Write an announcement...">
-            <button onclick="postAnnouncement()">Post</button>
-        </div>
-    </div>
-
-    <!-- ===== PROFILE (You) ===== -->
+    <!-- ===== PROFILE ===== -->
     <div id="tab-profile" class="tab-panel" style="display:none;">
-        <h1>Profile</h1>
+        <h1>Your Profile</h1>
+        <div id="coach-profile"></div>
+    </div>
+
+    <!-- ===== ADMIN PANEL ===== -->
+    <div id="tab-admin" class="tab-panel" style="display:none;">
+        <h1>Admin Panel</h1>
+
         <div class="card">
-            <h3>Coach Account</h3>
-            <p id="username-label-2"></p>
+            <h3>Staff Accounts</h3>
+            <div id="admin-staff-accounts"></div>
         </div>
+
         <div class="card">
-            <h3>Help & Support</h3>
-            <button onclick="switchTab('tab-help')">About, Help & Logout</button>
+            <h3>Player Accounts</h3>
+            <div id="admin-player-accounts"></div>
+        </div>
+
+        <div class="card">
+            <h3>Parent Accounts</h3>
+            <div id="admin-parent-accounts"></div>
+        </div>
+
+        <div class="card">
+            <h3>Audit Log</h3>
+            <div id="audit-log-list"></div>
         </div>
     </div>
 
-    <!-- ===== HELP & SUPPORT ===== -->
-    <div id="tab-help" class="tab-panel" style="display:none;">
-        <h1>Help & Support</h1>
-        <div class="card">
-            <h3>About App</h3>
-            <p>Sports Portal — Cricket Management System. Built as a Year 12 Software Engineering major project.</p>
-        </div>
-        <div class="card">
-            <button onclick="logout()">Log Out</button>
-        </div>
-    </div>
-
-</div>
-
-<!-- ===== Bottom Nav ===== -->
-<div class="bottom-nav">
-    <button class="nav-btn active" data-tab="tab-home" onclick="switchTab('tab-home')">Home</button>
-    <button class="nav-btn" data-tab="tab-schedule" onclick="switchTab('tab-schedule')">Schedule</button>
-    <button class="nav-btn" data-tab="tab-messages" onclick="switchTab('tab-messages')">Messages</button>
-    <button class="nav-btn" data-tab="tab-profile" onclick="switchTab('tab-profile')">You</button>
 </div>
 
 <script src="script.js"></script>
 <script>
     requireLogin("coach");
     renderNavbar();
-    renderMatches();
-    renderRoster();
+    applyPermissions();
+    renderTeamOverviewCoach();
+    renderRecentAnnouncementsHome();
+    renderRosterFiltered();
     renderFeesCoach();
-    renderAnnouncements();
+    renderMatches();
+    renderPhotos();
     renderMessages();
-    renderStaffAdmin();
-
-    const label2 = document.getElementById("username-label-2");
-    if (label2) label2.textContent = "Username: " + localStorage.getItem("loggedInUser");
+    renderAuditLog();
 </script>
 
-<div id="tab-admin" class="tab-panel" style="display:none;">
-    <h1>Admin</h1>
-    <div class="card">
-        <h3>Staff / Coaches</h3>
-        <div id="admin-staff-accounts"></div>
-        <hr>
-        <h3>Add Staff Member</h3>
-        <input type="text" id="new-staff-name" placeholder="Full name">
-        <input type="text" id="new-staff-username" placeholder="Username">
-        <input type="text" id="new-staff-password" placeholder="Password (min 6 chars)">
-        <select id="new-staff-position">
-            <option>Head Coach</option>
-            <option>Assistant Coach</option>
-            <option>Team Manager</option>
-            <option>Physio/Trainer</option>
-        </select>
-        <button onclick="addStaffMember()">Add Staff</button>
-    </div>
-    <div class="card">
-        <h3>Player Accounts</h3>
-        <div id="admin-player-accounts"></div>
-    </div>
-    <div class="card">
-        <h3>Parent Accounts</h3>
-        <div id="admin-parent-accounts"></div>
-    </div>
-    <div class="card">
-        <h3>Login Audit Log</h3>
-        <div id="audit-log-list"></div>
-    </div>
-</div>
+</body>
+</html>
