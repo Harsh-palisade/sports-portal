@@ -139,7 +139,7 @@ function initData() {
     localStorage.setItem("dataInitialized", "true");
 }
 
-// always make sure coach exists even if dataInitialized was set earlier
+// ===== ALWAYS ENSURE COACH EXISTS =====
 function ensureCoachAccount() {
     const users = getData("users");
     let coach = users.find(u => u.role === "coach" && u.username === "coach1");
@@ -158,8 +158,156 @@ function ensureCoachAccount() {
     }
 }
 
-// ===== LOGIN SECURITY (unchanged from your version, but now guaranteed data) =====
-// ... keep your showNotification, getAttemptsFor, setAttemptsFor, findAccount, persistAccount, login() exactly as you have ...
+// ===== ANNOUNCEMENTS FIX =====
+function ensureMoreAnnouncements() {
+    let items = getData("announcements");
+    if (items.length >= 20) return;
+
+    const extra = [
+        "Nets booked for Wednesday evening, all welcome.",
+        "New team kit sponsor confirmed — jerseys arriving next month.",
+        "Congratulations to the U16s on their tournament win!",
+        "Reminder: fill in your availability for next month's fixtures.",
+        "Pre-season fitness testing scheduled for next weekend.",
+        "Club AGM will be held in the clubhouse, all parents welcome.",
+        "New scoring app rollout — training session on how to use it.",
+        "Ground maintenance means no training this Friday.",
+        "Player of the Month voting is now open.",
+        "First aid kits have been restocked in the clubhouse.",
+        "Please return all borrowed training gear by Sunday.",
+        "End of season presentation night — date to be confirmed.",
+        "New assistant coach joining the squad next week.",
+        "Reminder to bring water bottles — hot weather forecast.",
+        "Car park will be closed for resurfacing this weekend.",
+        "Sponsorship packs available for anyone interested in helping the club.",
+        "Nutrition workshop for players and parents next Tuesday.",
+        "Under-13s trial dates have been posted on the noticeboard.",
+        "Please label all personal equipment clearly.",
+        "Thank you to all volunteers who helped at the weekend BBQ!"
+    ];
+
+    let counter = items.length + 1;
+    extra.forEach((text, i) => {
+        if (items.length >= 20) return;
+        const daysAgo = i + 1;
+        const d = new Date();
+        d.setDate(d.getDate() - daysAgo);
+        items.push({
+            id: "a" + counter,
+            text,
+            date: d.toISOString().split("T")[0]
+        });
+        counter++;
+    });
+
+    saveData("announcements", items);
+}
+
+// ===== LOGIN SECURITY =====
+function showNotification(message, type = "info") {
+    const box = document.getElementById("login-notifications");
+    if (!box) return;
+    const div = document.createElement("div");
+    div.className = `notification ${type}`;
+    div.textContent = message;
+    box.appendChild(div);
+    setTimeout(() => div.remove(), 5000);
+}
+
+function getAttemptsFor(username) {
+    const attempts = getData("loginAttempts");
+    const entry = attempts.find(a => a.username === username);
+    return entry ? entry.count : 0;
+}
+
+function setAttemptsFor(username, count) {
+    let attempts = getData("loginAttempts");
+    const entry = attempts.find(a => a.username === username);
+    if (entry) {
+        entry.count = count;
+    } else {
+        attempts.push({ username, count });
+    }
+    saveData("loginAttempts", attempts);
+}
+
+function findAccount(role, username) {
+    const users = getData("users");
+    return users.find(u => u.username === username && u.role === role);
+}
+
+function persistAccount(user) {
+    const users = getData("users");
+    const idx = users.findIndex(u => u.username === user.username && u.role === user.role);
+    if (idx !== -1) {
+        users[idx] = user;
+        saveData("users", users);
+    }
+}
+
+function login() {
+    const role = document.getElementById("role").value;
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!username || !password) {
+        showNotification("Please fill all fields.", "error");
+        return;
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+        showNotification(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`, "error");
+        return;
+    }
+
+    let account = findAccount(role, username);
+
+    if (!account) {
+        showNotification("Incorrect username or role.", "error");
+        return;
+    }
+
+    if (!account.active) {
+        showNotification("This account has been disabled.", "error");
+        return;
+    }
+
+    if (account.locked) {
+        showNotification("Account locked due to too many failed attempts.", "error");
+        return;
+    }
+
+    const attempts = getAttemptsFor(username);
+    if (attempts >= MAX_LOGIN_ATTEMPTS) {
+        account.locked = true;
+        persistAccount(account);
+        showNotification("Account locked due to too many failed attempts.", "error");
+        return;
+    }
+
+    if (account.password !== password) {
+        const newAttempts = attempts + 1;
+        setAttemptsFor(username, newAttempts);
+        if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+            account.locked = true;
+            persistAccount(account);
+            showNotification("Account locked due to too many failed attempts.", "error");
+        } else {
+            showNotification(`Incorrect password. Attempts: ${newAttempts}/${MAX_LOGIN_ATTEMPTS}`, "error");
+        }
+        return;
+    }
+
+    // success
+    setAttemptsFor(username, 0);
+    account.failedAttempts = 0;
+    persistAccount(account);
+
+    localStorage.setItem("loggedInRole", role);
+    localStorage.setItem("loggedInUser", username);
+
+    window.location.href = role + "-dashboard.html";
+}
 
 // ===== SESSION / NAVBAR / PERMISSIONS =====
 function requireLogin(expectedRole) {
@@ -194,6 +342,19 @@ function applyPermissions() {
         }
     });
 }
+
+// ===== INIT =====
+initData();
+ensureCoachAccount();
+ensureMoreAnnouncements();
+
+// only attach login handler on pages that have the button
+const loginBtn = document.getElementById("login-btn");
+if (loginBtn) {
+    loginBtn.addEventListener("click", login);
+}
+;
+ensureMoreAnnouncements();
 
 // ===== INIT =====
 initData();
